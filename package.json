@@ -1,0 +1,29 @@
+{
+  "name": "chatBack",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www",
+    "test": "node tests.js"
+  },
+  "dependencies": {
+    "assert": "^1.4.1",
+    "body-parser": "~1.13.2",
+    "client-sessions": "^0.7.0",
+    "cookie-parser": "~1.3.5",
+    "debug": "~2.2.0",
+    "express": "~4.13.1",
+    "jade": "~1.11.0",
+    "mongoose": "^4.5.2",
+    "morgan": "~1.6.1",
+    "primus": "^5.2.2",
+    "serve-favicon": "~2.3.0",
+    "websocket": "^1.0.23"
+  },
+  "devDependencies": {
+    "assert": "^1.4.1",
+    "mocha": "^2.5.3",
+    "should": "^9.0.2",
+    "supertest": "^1.2.0"
+  }
+}
