@@ -7,7 +7,7 @@ var assert = require('assert');
 
 request = request('http://localhost:3000');
 
-var models = require('../models/mongoose.js')
+var models = require('../models/mongoose.js');
 
 
 describe('Test /api/users', function () {
@@ -72,14 +72,14 @@ describe('Test /api/users', function () {
         if (err) {
           throw err;
         }
-        assert(res.body.length == 1)
+        assert(res.body.length == 1);
         done();
       });
   });
 
   it('fetch non existent user', function (done) {
     request.get('/api/users/12345').expect(500).expect(function (res) {
-      assert.equal(res.body.message, 'Error getting user');
+      assert.equal(res.body.message, 'Error getting or saving object');
     }).end(function (err, res) {
       if (err) {
         throw err;
@@ -129,12 +129,12 @@ describe('Test /api/channels', function () {
       if (count == 4) {
         done();
       }
-    }
+    };
 
     models.UserModel.create(
       {
         "email": "bob@gmail.com",
-        "name": "bob",
+        "name": "bob"
       },
       function (err, User) {
         assert.equal(err, null);
@@ -145,7 +145,7 @@ describe('Test /api/channels', function () {
     models.UserModel.create(
       {
         "email": "sandy@gmail.com",
-        "name": "sandy",
+        "name": "sandy"
       },
       function (err, User) {
         assert.equal(err, null);
@@ -156,7 +156,7 @@ describe('Test /api/channels', function () {
     models.UserModel.create(
       {
         "email": "billy@.com",
-        "name": "billy",
+        "name": "billy"
       },
       function (err, User) {
         assert.equal(err, null);
@@ -167,7 +167,7 @@ describe('Test /api/channels', function () {
     models.UserModel.create(
       {
         "email": "betty@.com",
-        "name": "betty",
+        "name": "betty"
       },
       function (err, User) {
         assert.equal(err, null);
@@ -222,18 +222,29 @@ describe('Test /api/channels', function () {
   });
 
   let newMessageResult;
-
+  let cookie;
+  
+  it('do a login', function (done) {
+    request.post('/api/users/login')
+      .send({'email': Users[0].email})
+      .expect(200)
+      .end(function (err, res) {
+        cookie = res.headers['set-cookie'][0];
+        done();
+      })
+  });
+  
   it('add message to a channel', function (done) {
     let call = request.post('/api/channels/' + channelId + '/messages');
-    call.set('user', Users[0]._id)
+    call.cookies = cookie;
     call.send({'message': 'this is a message'})
       .expect(200)
-      .end(function(err, res) {
+      .end(function (err, res) {
         newMessageResult = res.body;
         done()
       });
   });
-
+  
   it('verify that the message was added', function (done) {
     request.get('/api/channels/' + channelId + '/messages')
       .expect(200)
@@ -273,6 +284,7 @@ describe('Test /api/channels', function () {
       done();
     });
   });
-
-});
+  
+})
+;
 

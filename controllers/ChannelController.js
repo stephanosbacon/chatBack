@@ -1,6 +1,7 @@
 "use strict";
 
 var ChannelModel = require('../models/ChannelModel.js');
+var handleErrorsAndDo = require('./handleErrorsAndDo.js');
 
 /**
  * ChannelController.js
@@ -8,49 +9,33 @@ var ChannelModel = require('../models/ChannelModel.js');
  * @description :: Server-side logic for managing Channels.
  */
 
-function handleErrorsAndDo(_res, _cb) {
-  let cb = _cb;
-  let res = _res;
-  return function (err, Channel) {
-    if (err) {
-      return res.status(500).json({
-        message: 'Error getting or saving Channel.'
-      });
-    }
-    if (!Channel) {
-      return res.status(404).json({
-        message: 'No such Channel'
-      });
-    }
-    cb(Channel);
-  }
-}
-
 function saveChannel(res, Channel, msg) {
   Channel.save(handleErrorsAndDo(res,
     (Channel) => {
-      return res.status(200).json(
-        {
-          'message': msg,
-          'channelId': Channel._id
-        }
-      );
+      res.status(200)
+        .json(
+          {
+            'message': msg,
+            'channelId': Channel._id
+          }
+        )
+        .end();
     }
   ));
 }
 
 module.exports = {
-
+  
   /**
    * ChannelController.list()
    */
   list: function (req, res) {
     ChannelModel.find(handleErrorsAndDo(res,
       (Channels) => {
-        return res.status(200).json(Channels);
+        res.status(200).json(Channels).end();
       }));
   },
-
+  
   /**
    * ChannelController.showChannelsForUser()
    */
@@ -59,10 +44,10 @@ module.exports = {
     ChannelModel.find({"users": id},
       handleErrorsAndDo(res,
         (Channels) => {
-          return res.status(200).json(Channels)
+          res.status(200).json(Channels).end();
         }));
   },
-
+  
   /**
    * ChannelController.showUsers()
    */
@@ -71,14 +56,15 @@ module.exports = {
     ChannelModel.findOne({_id: id},
       handleErrorsAndDo(res,
         (Channel)=> {
-          return res.status(200).json(
-            {
+          res.status(200)
+            .json({
               'channelId': Channel._id,
               'users': Channel.users
-            });
+            })
+            .end();
         }));
   },
-
+  
   /**
    * ChannelController.showMessages()
    */
@@ -87,15 +73,16 @@ module.exports = {
     ChannelModel.findOne({_id: id},
       handleErrorsAndDo(res,
         (Channel) => {
-          return res.json(
-            {
+          res.status(200)
+            .json({
               'channelId': Channel._id,
               'name': Channel.name,
               'messages': Channel.messages
-            });
+            })
+            .end();
         }))
   },
-
+  
   /**
    * ChannelController.create()
    */
@@ -105,11 +92,9 @@ module.exports = {
       messages: [],
       name: req.body.name
     });
-
     saveChannel(res, Channel, 'Channel ' + Channel.name + ' created');
-
   },
-
+  
   /**
    * ChannelController.newMessage
    */
@@ -117,25 +102,26 @@ module.exports = {
     var id = req.params.id;
     ChannelModel.findOne({_id: id},
       handleErrorsAndDo(res, (Channel) => {
-
         if (!req.body || !req.body.message) {
-          return res.status(500).json({
-            'message': 'No message in body'
-          })
+          res.status(500)
+            .json({
+              'message': 'No message in body'
+            })
+            .end();
+        } else {
+          let user = req.cookies.user;
+          let msg = {
+            "text": req.body.message,
+            "postedBy": user,
+            "postedTime": new Date()
+          };
+          Channel.messages.push(msg);
+          saveChannel(res, Channel, msg);
         }
-
-        let msg = {
-          "text": req.body.message,
-          "postedBy": req.headers.user,
-          "postedTime": new Date()
-        };
-
-        Channel.messages.push(msg);
-
-        saveChannel(res, Channel, msg);
-      }));
+        }
+      ));
   },
-
+  
   /**
    * ChannelController.addUser
    */
@@ -148,7 +134,7 @@ module.exports = {
         }
       ));
   },
-
+  
   /**
    * ChannelController.remove()
    */
@@ -156,8 +142,8 @@ module.exports = {
     var id = req.params.id;
     ChannelModel.findByIdAndRemove(id,
       handleErrorsAndDo(res, (Channel)=> {
-        return res.json(Channel);
-      }
+          res.json(Channel).end();
+        }
       ));
   }
 };
