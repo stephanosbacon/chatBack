@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "test": "node tests.js"
+    "test": "mocha"
   },
   "dependencies": {
     "assert": "^1.4.1",
+    "bluebird": "^3.4.7",
     "body-parser": "~1.13.2",
     "client-sessions": "^0.7.0",
     "cookie-parser": "~1.3.5",
@@ -17,9 +18,11 @@
     "jade": "~1.11.0",
     "mongoose": "^4.5.2",
     "morgan": "~1.6.1",
-    "primus": "^5.2.2",
     "serve-favicon": "~2.3.0",
-    "websocket": "^1.0.23"
+    "tick-tock": "^1.0.0",
+    "url-parse": "^1.1.1",
+    "websocket": "^1.0.23",
+    "ws": "^1.1.1"
   },
   "devDependencies": {
     "assert": "^1.4.1",

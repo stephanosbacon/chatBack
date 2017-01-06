@@ -16,7 +16,8 @@ module.exports = {
   login: function (req, res) {
     UserModel.findOne({"email": req.body.email},
       handleErrorsAndDo(res, (User) => {
-        res.cookie('user', User._id).status(200).end();
+        res.cookie('user', User._id)
+          .status(200).json({'id' : User._id}).end();
       }));
   },
   

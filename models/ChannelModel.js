@@ -23,8 +23,11 @@ var ChannelSchema = new Schema({
 	"name" : String
 });
 
+
 ChannelSchema.statics.getUserChannels = function (userid, cb) {
-  ChannelSchema.find({"users": userid}, cb);
+  ChannelModel.find({"users": userid}, cb);
 };
 
-module.exports = mongoose.model('Channel', ChannelSchema);
+var ChannelModel = mongoose.model('Channel', ChannelSchema);
+
+module.exports = ChannelModel;

@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+"use strict";
+
 /**
  * Module dependencies.
  */
@@ -20,6 +22,7 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
+app.server = server;
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -28,6 +31,39 @@ var server = http.createServer(app);
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
+
+var url             = require('url')
+  , WebSocketServer = require('ws').Server
+  , wss             = new WebSocketServer({'server': server});
+
+var userSocketMap = {};
+
+wss.on('connection', function connection(ws) {
+  var location = url.parse(ws.upgradeReq.url, true);
+  // you might use location.query.access_token to authenticate or share sessions
+  // or ws.upgradeReq.headers.cookie (see http://stackoverflow.com/a/16395220/151312)
+
+  ws.on('message', function incoming(message, flags) {
+    let obj = JSON.parse(message);
+    console.log('#Websocket connection from user: ', message);
+    if (!userSocketMap[obj.id]) {
+      userSocketMap[obj.id] = { sockets : [] };
+    }
+    userSocketMap[obj.id].sockets.push(ws);
+  });
+});
+
+server.broadcast = function(channel, message) {
+  console.log('***** broadcast babee:\n', '*****channel:\n', channel, '\n*****message:\n', message);
+  channel.users.forEach((item, index) => {
+    if (!(item == message.postedBy) && (userSocketMap[item])) {
+      userSocketMap[item].sockets.forEach((item, index) => {
+        item.send(JSON.stringify(message));
+      });
+    }
+  });
+};
+
 
 /**
  * Normalize a port into a number, string, or false.

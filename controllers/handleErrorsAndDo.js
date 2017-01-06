@@ -3,7 +3,7 @@
 module.exports = function (_res, _cb) {
   let cb = _cb;
   let res = _res;
-  return function (err, Obj) {
+  return function (err, obj) {
     if (err) {
       res.status(500)
         .json({
@@ -12,7 +12,7 @@ module.exports = function (_res, _cb) {
           }
         )
         .end();
-    } else if (!Obj) {
+    } else if (!obj) {
       res.status(404)
         .json({
             'message': 'No such object'
@@ -20,8 +20,7 @@ module.exports = function (_res, _cb) {
         )
         .end();
     } else {
-      cb(Obj);
+      cb(obj);
     }
   }
 };
-

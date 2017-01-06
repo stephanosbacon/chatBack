@@ -1,6 +1,7 @@
 "use strict";
 
-var ChannelModel = require('../models/ChannelModel.js');
+var mongoose = require('mongoose');
+var ChannelModel = mongoose.model('Channel');
 var handleErrorsAndDo = require('./handleErrorsAndDo.js');
 
 /**
@@ -25,7 +26,7 @@ function saveChannel(res, Channel, msg) {
 }
 
 module.exports = {
-  
+
   /**
    * ChannelController.list()
    */
@@ -35,19 +36,20 @@ module.exports = {
         res.status(200).json(Channels).end();
       }));
   },
-  
+
   /**
    * ChannelController.showChannelsForUser()
    */
   showChannelsForUser: function (req, res) {
+
     var id = req.params.userid;
-    ChannelModel.find({"users": id},
+    ChannelModel.getUserChannels(id,
       handleErrorsAndDo(res,
         (Channels) => {
           res.status(200).json(Channels).end();
         }));
   },
-  
+
   /**
    * ChannelController.showUsers()
    */
@@ -64,7 +66,7 @@ module.exports = {
             .end();
         }));
   },
-  
+
   /**
    * ChannelController.showMessages()
    */
@@ -82,7 +84,7 @@ module.exports = {
             .end();
         }))
   },
-  
+
   /**
    * ChannelController.create()
    */
@@ -94,14 +96,14 @@ module.exports = {
     });
     saveChannel(res, Channel, 'Channel ' + Channel.name + ' created');
   },
-  
+
   /**
    * ChannelController.newMessage
    */
   newMessage: function (req, res) {
     var id = req.params.id;
     ChannelModel.findOne({_id: id},
-      handleErrorsAndDo(res, (Channel) => {
+      handleErrorsAndDo(res, (channel) => {
         if (!req.body || !req.body.message) {
           res.status(500)
             .json({
@@ -115,13 +117,14 @@ module.exports = {
             "postedBy": user,
             "postedTime": new Date()
           };
-          Channel.messages.push(msg);
-          saveChannel(res, Channel, msg);
+          channel.messages.push(msg);
+          req.socket.server.broadcast(channel, msg);
+          saveChannel(res, channel, msg);
         }
         }
       ));
   },
-  
+
   /**
    * ChannelController.addUser
    */
@@ -134,7 +137,7 @@ module.exports = {
         }
       ));
   },
-  
+
   /**
    * ChannelController.remove()
    */
