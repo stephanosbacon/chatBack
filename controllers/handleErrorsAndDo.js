@@ -7,17 +7,15 @@ module.exports = function (_res, _cb) {
     if (err) {
       res.status(500)
         .json({
-            'message': 'Error getting or saving object',
-            'err': err
-          }
-        )
+          'message': 'Error getting or saving object',
+          'err': err
+        })
         .end();
     } else if (!obj) {
       res.status(404)
         .json({
-            'message': 'No such object'
-          }
-        )
+          'message': 'No such object'
+        })
         .end();
     } else {
       cb(obj);

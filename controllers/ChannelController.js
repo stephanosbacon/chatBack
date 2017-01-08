@@ -14,12 +14,10 @@ function saveChannel(res, Channel, msg) {
   Channel.save(handleErrorsAndDo(res,
     (Channel) => {
       res.status(200)
-        .json(
-          {
-            'message': msg,
-            'channelId': Channel._id
-          }
-        )
+        .json({
+          'message': msg,
+          'channelId': Channel._id
+        })
         .end();
     }
   ));
@@ -33,7 +31,9 @@ module.exports = {
   list: function (req, res) {
     ChannelModel.find(handleErrorsAndDo(res,
       (Channels) => {
-        res.status(200).json(Channels).end();
+        res.status(200)
+          .json(Channels)
+          .end();
       }));
   },
 
@@ -46,7 +46,9 @@ module.exports = {
     ChannelModel.getUserChannels(id,
       handleErrorsAndDo(res,
         (Channels) => {
-          res.status(200).json(Channels).end();
+          res.status(200)
+            .json(Channels)
+            .end();
         }));
   },
 
@@ -55,9 +57,11 @@ module.exports = {
    */
   showUsers: function (req, res) {
     var id = req.params.id;
-    ChannelModel.findOne({_id: id},
+    ChannelModel.findOne({
+        _id: id
+      },
       handleErrorsAndDo(res,
-        (Channel)=> {
+        (Channel) => {
           res.status(200)
             .json({
               'channelId': Channel._id,
@@ -72,7 +76,9 @@ module.exports = {
    */
   showMessages: function (req, res) {
     var id = req.params.id;
-    ChannelModel.findOne({_id: id},
+    ChannelModel.findOne({
+        _id: id
+      },
       handleErrorsAndDo(res,
         (Channel) => {
           res.status(200)
@@ -102,7 +108,9 @@ module.exports = {
    */
   newMessage: function (req, res) {
     var id = req.params.id;
-    ChannelModel.findOne({_id: id},
+    ChannelModel.findOne({
+        _id: id
+      },
       handleErrorsAndDo(res, (channel) => {
         if (!req.body || !req.body.message) {
           res.status(500)
@@ -121,8 +129,7 @@ module.exports = {
           req.socket.server.broadcast(channel, msg);
           saveChannel(res, channel, msg);
         }
-        }
-      ));
+      }));
   },
 
   /**
@@ -130,12 +137,13 @@ module.exports = {
    */
   addUser: function (req, res) {
     var id = req.params.id;
-    ChannelModel.findOne({_id: id},
+    ChannelModel.findOne({
+        _id: id
+      },
       handleErrorsAndDo(res, (Channel) => {
-          Channel.users.push(req.params.userid);
-          saveChannel(res, Channel, 'user ' + req.params.userid + ' added');
-        }
-      ));
+        Channel.users.push(req.params.userid);
+        saveChannel(res, Channel, 'user ' + req.params.userid + ' added');
+      }));
   },
 
   /**
@@ -144,9 +152,15 @@ module.exports = {
   remove: function (req, res) {
     var id = req.params.id;
     ChannelModel.findByIdAndRemove(id,
-      handleErrorsAndDo(res, (Channel)=> {
-          res.json(Channel).end();
-        }
-      ));
+      handleErrorsAndDo(res, (Channel) => {
+        res.json(Channel)
+          .end();
+      }));
   }
+}; >
+{
+  res.json(Channel)
+  .end();
+}));
+}
 };

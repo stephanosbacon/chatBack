@@ -17,7 +17,8 @@ var UserSchema = new Schema({
 UserSchema.statics.create = function (obj, cb) {
   var UserModel = mongoose.model('User');
   var User = new UserModel({
-    username: obj.email.replace('@', '__').replace('.', '__'),
+    username: obj.email.replace('@', '__')
+      .replace('.', '__'),
     name: obj.name,
     email: obj.email,
     status: obj.status ? obj.status : "status free"
@@ -26,7 +27,9 @@ UserSchema.statics.create = function (obj, cb) {
 };
 
 UserSchema.statics.update = function (id, obj, cb) {
-  UserModel.findOne({_id: id}, function (err, User) {
+  UserModel.findOne({
+    _id: id
+  }, function (err, User) {
     if (err) {
       cb(err, null);
     } else if (!User) {

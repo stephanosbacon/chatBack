@@ -14,28 +14,38 @@ module.exports = {
    * UserController.login()
    */
   login: function (req, res) {
-    UserModel.findOne({"email": req.body.email},
+    UserModel.findOne({
+        "email": req.body.email
+      },
       handleErrorsAndDo(res, (User) => {
         res.cookie('user', User._id)
-          .status(200).json({'id' : User._id}).end();
+          .status(200)
+          .json({
+            '_id': User._id
+          })
+          .end();
       }));
   },
-  
+
   /**
    * UserController.list()
    */
   list: function (req, res) {
     UserModel.find(handleErrorsAndDo(res,
-      (Users) => { res.json(Users).end(); }));
-  }
-  ,
+      (Users) => {
+        res.json(Users)
+          .end();
+      }));
+  },
 
   /**
    * UserController.show()
    */
   show: function (req, res) {
     var id = req.params.id;
-    UserModel.findOne({_id: id}, handleErrorsAndDo(res,
+    UserModel.findOne({
+      _id: id
+    }, handleErrorsAndDo(res,
       (User) => {
         res.status(200)
           .json({
@@ -43,12 +53,11 @@ module.exports = {
             'email': User.email,
             'username': User.username,
             'status': User.status,
-            'id': User._id
+            '_id': User._id
           })
           .end();
       }));
-  }
-  ,
+  },
 
   /**
    * UserController.create()
@@ -63,8 +72,7 @@ module.exports = {
           })
           .end();
       }));
-  }
-  ,
+  },
 
   /**
    * UserController.update()
@@ -73,10 +81,11 @@ module.exports = {
     var id = req.params.id;
     UserModel.update(id, req.body, handleErrorsAndDo(res,
       (User) => {
-        res.status(200).json(User).end();
+        res.status(200)
+          .json(User)
+          .end();
       }));
-  }
-  ,
+  },
 
   /**
    * UserController.remove()
@@ -85,8 +94,17 @@ module.exports = {
     var id = req.params.id;
     UserModel.findByIdAndRemove(id, handleErrorsAndDo(res,
       (User) => {
-        res.status(200).json(User).end();
+        res.status(200)
+          .json(User)
+          .end();
       }));
   }
+};
+e(id, handleErrorsAndDo(res,
+  (User) => {
+    res.status(200)
+      .json(User)
+      .end();
+  }));
 }
-;
+};
