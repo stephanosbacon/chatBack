@@ -1,15 +1,19 @@
 "use strict";
 
-var request = require('supertest');
-var should = require('should');
-var express = require('express');
-var assert = require('assert');
-var models = require('../../models/mongoose.js');
+let config = require(process.cwd() + '/config')('testClient');
+let include = config.include;
 
-var request = request('https://localhost:3000');
+let request = require('supertest');
+let should = require('should');
+let express = require('express');
+let assert = require('assert');
+
+let models = include('models/mongoose.js');
+
+let req = request(config.serverUrl);
 
 module.exports = function (callback) {
-  var Users;
+  let Users;
 
   describe('Create Users', function () {
     it('clear users', function (done) {
@@ -22,8 +26,8 @@ module.exports = function (callback) {
     });
 
     it('create users', function (done) {
-      var count = 0;
-      var sayDone = function (err) {
+      let count = 0;
+      let sayDone = function (err) {
         count++;
         if (count == 4) {
           done(err);
@@ -72,7 +76,7 @@ module.exports = function (callback) {
     });
 
     it('verify all users created', function (done) {
-      request.get('/api/users')
+      req.get('/api/users')
         .expect('Content-Type', /json/)
         .expect(200)
         .end(function (err, res) {

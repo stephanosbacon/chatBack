@@ -100,11 +100,3 @@ module.exports = {
       }));
   }
 };
-e(id, handleErrorsAndDo(res,
-  (User) => {
-    res.status(200)
-      .json(User)
-      .end();
-  }));
-}
-};

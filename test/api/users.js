@@ -1,15 +1,19 @@
 "use strict";
 
-var request = require('supertest');
-var should = require('should');
-var express = require('express');
-var assert = require('assert');
-var models = require('../../models/mongoose.js');
+let config = require(process.cwd() + '/config')('testClient');
+let include = config.include;
 
-var request = request('https://localhost:3000');
+let request = require('supertest');
+let should = require('should');
+let express = require('express');
+let assert = require('assert');
+
+let models = include('models/mongoose.js');
+
+let req = request(config.serverUrl);
 
 describe('Test /api/users', function () {
-  var firstUserId;
+  let firstUserId;
 
   it('clear', function (done) {
     models.UserModel.find({})
@@ -18,7 +22,7 @@ describe('Test /api/users', function () {
   });
 
   it('simple get', function (done) {
-    request.get('/api/users')
+    req.get('/api/users')
       .expect('Content-Type', /json/)
       .expect(200)
       .end(function (err, res) {
@@ -30,7 +34,7 @@ describe('Test /api/users', function () {
   });
 
   it('add a user', function (done) {
-    request.post('/api/users')
+    req.post('/api/users')
       .send({
         'name': 'Bob',
         'email': 'Bob@gmail.com',
@@ -51,7 +55,7 @@ describe('Test /api/users', function () {
   });
 
   it('fetch the new user', function (done) {
-    request.get('/api/users/' + firstUserId)
+    req.get('/api/users/' + firstUserId)
       .expect(200)
       .expect(function (res) {
         assert.equal(res.body.name, "Bob", "name is wrong");
@@ -69,7 +73,7 @@ describe('Test /api/users', function () {
   });
 
   it('fetch all Users', function (done) {
-    request.get('/api/users')
+    req.get('/api/users')
       .expect('Content-Type', /json/)
       .expect(200)
       .end(function (err, res) {
@@ -82,7 +86,7 @@ describe('Test /api/users', function () {
   });
 
   it('fetch non existent user', function (done) {
-    request.get('/api/users/12345')
+    req.get('/api/users/12345')
       .expect(500)
       .expect(function (res) {
         assert.equal(res.body.message, 'Error getting or saving object');
@@ -98,7 +102,7 @@ describe('Test /api/users', function () {
 
 
   it('verify unique email', function (done) {
-    request.post('/api/users')
+    req.post('/api/users')
       .send({
         'name': 'Bob',
         'email': 'Bob@gmail.com',

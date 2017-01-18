@@ -1,15 +1,16 @@
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var session = require('cookie-session');
+let express = require('express');
+let path = require('path');
+let favicon = require('serve-favicon');
+let logger = require('morgan');
+let cookieParser = require('cookie-parser');
+let bodyParser = require('body-parser');
+let session = require('cookie-session');
 
-var app = express();
-require('./models/mongoose.js');
+let app = express();
 
-var expiryDate = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+include('models/mongoose.js');
+
+let expiryDate = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 app.use(session({
   name: 'session',
   keys: ['key1', 'key2'],
@@ -36,11 +37,11 @@ app.use(bodyParser.urlencoded({
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-require('./routes')(app);
+include('routes')(app);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-  var err = new Error('Not Found');
+  let err = new Error('Not Found');
   err.status = 404;
   next(err);
 });

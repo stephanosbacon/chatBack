@@ -1,16 +1,20 @@
 "use strict";
 
-var request = require('supertest');
-var should = require('should');
-var express = require('express');
-var assert = require('assert');
-var models = require('../../models/mongoose.js');
+let config = require(process.cwd() + '/config')('testClient');
+let include = config.include;
 
-var request = request('https://localhost:3000');
+let request = require('supertest');
+let should = require('should');
+let express = require('express');
+let assert = require('assert');
+let models = include('models/mongoose.js');
+
+let req = request(config.serverUrl);
+let Users;
 
 
 
-require('../util/createUsers')((ret) => {
+include('test/util/createUsers')((ret) => {
   Users = ret;
 });
 
@@ -26,7 +30,7 @@ describe('Test /api/channels', function () {
   });
 
   it('create a channel', function (done) {
-    request.post('/api/channels')
+    req.post('/api/channels')
       .send({
         'users': [Users[0]._id, Users[1]._id],
         'name': 'A channel'
@@ -41,7 +45,7 @@ describe('Test /api/channels', function () {
   });
 
   it('get all channels', function (done) {
-    request.get('/api/channels')
+    req.get('/api/channels')
       .expect(200)
       .end(function (err, res) {
         assert.equal(res.body.length, 1, 'check body length');
@@ -54,7 +58,7 @@ describe('Test /api/channels', function () {
   });
 
   it('get channels for a user', function (done) {
-    request.get('/api/channels/foruser/' + Users[0]._id)
+    req.get('/api/channels/foruser/' + Users[0]._id)
       .expect(200)
       .end(function (err, res) {
         if (err) {
@@ -71,7 +75,7 @@ describe('Test /api/channels', function () {
   let cookie;
 
   it('do a login', function (done) {
-    request.post('/api/users/login')
+    req.post('/api/users/login')
       .send({
         'email': Users[0].email
       })
@@ -83,7 +87,7 @@ describe('Test /api/channels', function () {
   });
 
   it('add message to a channel', function (done) {
-    let call = request.post('/api/channels/' + channelId + '/messages');
+    let call = req.post('/api/channels/' + channelId + '/messages');
     call.cookies = cookie;
     call.send({
         'message': 'this is a message'
@@ -96,7 +100,7 @@ describe('Test /api/channels', function () {
   });
 
   it('verify that the message was added', function (done) {
-    request.get('/api/channels/' + channelId + '/messages')
+    req.get('/api/channels/' + channelId + '/messages')
       .expect(200)
       .end(function (err, res) {
         assert(res.body.messages.length == 1, 'single message returned');
@@ -109,7 +113,7 @@ describe('Test /api/channels', function () {
   });
 
   it('add a user to a channel', function (done) {
-    request.put('/api/channels/' + channelId + '/users/' + Users[2]._id)
+    req.put('/api/channels/' + channelId + '/users/' + Users[2]._id)
       .expect(200)
       .end(function (err, res) {
         assert.equal(res.body.channelId, channelId);
@@ -119,7 +123,7 @@ describe('Test /api/channels', function () {
   });
 
   it('verify that the user was added', function (done) {
-    request.get('/api/channels/' + channelId + '/users')
+    req.get('/api/channels/' + channelId + '/users')
       .expect(200)
       .end(function (err, res) {
         assert(res.body.users.length == 3);
@@ -129,7 +133,7 @@ describe('Test /api/channels', function () {
   });
 
   it('try dummy route', function (done) {
-    request.get('/api/channels/dummy')
+    req.get('/api/channels/dummy')
       .expect(403)
       .end(function (err, res) {
         assert.equal(res.body.message, 'unknown url');

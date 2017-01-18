@@ -1,17 +1,22 @@
 "use strict";
 
-var request = require('supertest');
-var should = require('should');
-var express = require('express');
-var assert = require('assert');
-var models = require('../models/mongoose.js');
+let config = require(process.cwd() + '/config')('testClient');
+let include = config.include;
+
+let request = require('supertest');
+let should = require('should');
+let express = require('express');
+let assert = require('assert');
 
 
-var request = request('https://localhost:3000');
+let models = include('models/mongoose.js');
+
+
+let req = request(config.serverUrl);
 
 describe('Test invalid urls', function () {
   it('empty path', function (done) {
-    request.get('/')
+    req.get('/')
       .expect(403)
       .expect((res) => {
         assert.equal(res.body.message, 'unknown url');
@@ -22,7 +27,7 @@ describe('Test invalid urls', function () {
       });
   });
   it('empty path', function (done) {
-    request.put('/')
+    req.put('/')
       .expect(403)
       .expect((res) => {
         assert.equal(res.body.message, 'unknown url');
@@ -32,7 +37,7 @@ describe('Test invalid urls', function () {
       });
   });
   it('empty path', function (done) {
-    request.post('/')
+    req.post('/')
       .expect(403)
       .expect((res) => {
         assert.equal(res.body.message, 'unknown url');
@@ -42,7 +47,7 @@ describe('Test invalid urls', function () {
       });
   });
   it('invalid path', function (done) {
-    request.get('/api/foo')
+    req.get('/api/foo')
       .expect(403)
       .expect((res) => {
         assert.equal(res.body.message, 'unknown url');
@@ -53,7 +58,7 @@ describe('Test invalid urls', function () {
       });
   });
   it('invalid path', function (done) {
-    request.put('/flubber')
+    req.put('/flubber')
       .expect(403)
       .expect((res) => {
         assert.equal(res.body.message, 'unknown url');
@@ -63,7 +68,7 @@ describe('Test invalid urls', function () {
       });
   });
   it('invalid path', function (done) {
-    request.post('/flee/floo/flim/api/channels')
+    req.post('/flee/floo/flim/api/channels')
       .expect(403)
       .expect((res) => {
         assert.equal(res.body.message, 'unknown url');

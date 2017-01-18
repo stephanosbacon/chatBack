@@ -157,10 +157,4 @@ module.exports = {
           .end();
       }));
   }
-}; >
-{
-  res.json(Channel)
-  .end();
-}));
-}
 };

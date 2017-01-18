@@ -2,7 +2,8 @@
 
 var express = require('express');
 var router = express.Router();
-var ChannelController = require('../controllers/ChannelController.js');
+
+var ChannelController = include('controllers/ChannelController.js');
 
 router.get('/', ChannelController.list);
 router.get('/:id/messages', ChannelController.showMessages);

@@ -8,7 +8,7 @@ var bluebird = require('bluebird');
 mongoose.Promise = bluebird
 
 
-mongoose.connect('mongodb://localhost/chatter')
+mongoose.connect(config.databaseUrl);
 
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));

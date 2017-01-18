@@ -1,14 +1,19 @@
-var request = require('supertest');
-var should = require('should');
-var express = require('express');
-var assert = require('assert');
+"use strict";
 
-var request = request('https://localhost:3000');
+let config = require(process.cwd() + '/config')('testClient');
+let include = config.include;
 
-var models = require('../models/mongoose.js');
+let request = require('supertest');
+let should = require('should');
+let express = require('express');
+let assert = require('assert');
 
-var Users;
-require('./util/createUsers')((ret) => {
+let req = request(config.serverUrl);
+
+let models = include('models/mongoose.js');
+
+let Users;
+include('test/util/createUsers')((ret) => {
   Users = ret;
 });
 
@@ -25,7 +30,7 @@ describe('socket', function () {
 
   it('do the logins', function (done) {
 
-    request.post('/api/users/login')
+    req.post('/api/users/login')
       .send({
         'email': Users[0].email
       })
@@ -35,7 +40,7 @@ describe('socket', function () {
         user1 = res.body;
       });
 
-    request.post('/api/users/login')
+    req.post('/api/users/login')
       .send({
         'email': Users[1].email
       })
@@ -48,7 +53,7 @@ describe('socket', function () {
   });
 
   it('get channels for a user', function (done) {
-    request.get('/api/channels/foruser/' + Users[0]._id)
+    req.get('/api/channels/foruser/' + Users[0]._id)
       .expect(200)
       .end(function (err, res) {
         if (err) {
@@ -60,7 +65,7 @@ describe('socket', function () {
   });
 
   it('create a channel', function (done) {
-    request.post('/api/channels')
+    req.post('/api/channels')
       .send({
         'users': [Users[0]._id, Users[1]._id],
         'name': 'A channel'
@@ -75,7 +80,7 @@ describe('socket', function () {
   });
 
   it('get channels for user 0', function (done) {
-    request.get('/api/channels/foruser/' + Users[0]._id)
+    req.get('/api/channels/foruser/' + Users[0]._id)
       .expect(200)
       .end(function (err, res) {
         channelId = res.body[0]._id;
@@ -85,7 +90,7 @@ describe('socket', function () {
 
   it('create the sockets', function (done) {
 
-    var WebSocket = require('ws');
+    let WebSocket = require('ws');
     socket1 = new WebSocket('https://localhost:3000/api/channels', {}, {
       headers: JSON.stringify(user1)
     });
@@ -103,7 +108,7 @@ describe('socket', function () {
   });
 
   it('assert that sockets are set up', function (done) {
-    var WebSocket = require('ws');
+    let WebSocket = require('ws');
     assert.equal(socket1.readyState, WebSocket.OPEN);
     assert.equal(socket2.readyState, WebSocket.OPEN);
     done();
@@ -129,7 +134,7 @@ describe('socket', function () {
   });
 
   it('add message to a channel', function (done) {
-    let call = request.post('/api/channels/' + channelId + '/messages');
+    let call = req.post('/api/channels/' + channelId + '/messages');
     call.cookies = cookie1;
     call.send({
         'message': 'this is a message see if user 2 gets it'
@@ -142,7 +147,7 @@ describe('socket', function () {
   });
 
   it('add message to a channel', function (done) {
-    let call = request.post('/api/channels/' + channelId + '/messages');
+    let call = req.post('/api/channels/' + channelId + '/messages');
     call.cookies = cookie2;
     call.send({
         'message': 'this is a message see if user 1 gets it'
