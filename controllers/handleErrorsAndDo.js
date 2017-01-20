@@ -20,5 +20,5 @@ module.exports = function (_res, _cb) {
     } else {
       cb(obj);
     }
-  }
+  };
 };

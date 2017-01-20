@@ -13,6 +13,7 @@ let req = request(config.serverUrl);
 let models = include('models/mongoose.js');
 
 let Users;
+
 include('test/util/createUsers')((ret) => {
   Users = ret;
 });

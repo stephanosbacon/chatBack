@@ -1,5 +1,8 @@
-// configType - dev, testClient, prod
-//
+/**
+ * configType - dev, testClient, prod - there should be a file in '.' called config-<configType>.js
+ * The config files assume that they have access to the global functions abs_path and include defined
+ * herein.
+ */
 function config(configType) {
 
   let base_dir = process.cwd();

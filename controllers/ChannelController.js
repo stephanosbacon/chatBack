@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var mongoose = require('mongoose');
 var ChannelModel = mongoose.model('Channel');
@@ -88,7 +88,7 @@ module.exports = {
               'messages': Channel.messages
             })
             .end();
-        }))
+        }));
   },
 
   /**
@@ -121,9 +121,9 @@ module.exports = {
         } else {
           let user = req.cookies.user;
           let msg = {
-            "text": req.body.message,
-            "postedBy": user,
-            "postedTime": new Date()
+            text: req.body.message,
+            postedBy: user,
+            postedTime: new Date()
           };
           channel.messages.push(msg);
           req.socket.server.broadcast(channel, msg);

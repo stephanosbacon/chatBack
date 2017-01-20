@@ -1,11 +1,9 @@
-"use strict";
+'use strict';
 
 let config = require(process.cwd() + '/config')('testClient');
 let include = config.include;
 
 let request = require('supertest');
-let should = require('should');
-let express = require('express');
 let assert = require('assert');
 
 let models = include('models/mongoose.js');
