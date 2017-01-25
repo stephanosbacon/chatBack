@@ -1,21 +1,18 @@
 'use strict';
 
+let Status = include('util/status.js');
+
 module.exports = function (_res, _cb) {
   let cb = _cb;
   let res = _res;
   return function (err, obj) {
     if (err) {
       res.status(500)
-        .json({
-          'message': 'Error getting or saving object',
-          'err': err
-        })
+        .json(new Status(500, 'Error getting or saving object', err))
         .end();
     } else if (!obj) {
       res.status(404)
-        .json({
-          'message': 'No such object'
-        })
+        .json(new Status(404, 'No such object'))
         .end();
     } else {
       cb(obj);

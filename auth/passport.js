@@ -1,7 +1,11 @@
+'use strict';
+
+// const debug = require('debug')('chatBack/auth/passport');
+
 // Importing Passport, strategies, and config
 const passport = require('passport');
-const User = require('../models/user');
-const config = require('./main');
+const models = include('models/mongoose.js');
+
 const JwtStrategy = require('passport-jwt')
   .Strategy;
 const ExtractJwt = require('passport-jwt')
@@ -12,54 +16,51 @@ const localOptions = {
   usernameField: 'email'
 };
 
-const localLogin = new LocalStrategy(localOptions, localStrategyHadler);
-const jwtLogin = new JwtStrategy(jwtOptions, jwtLoginHandler);
+// Setting up JWT login strategy
+const jwtOptions = {
+  // Telling Passport to check authorization headers for JWT
+  jwtFromRequest: ExtractJwt.fromAuthHeader(),
+  // Telling Passport where to find the secret
+  secretOrKey: config.secrets.jwtSecret
+};
+
+
+const localLogin = new LocalStrategy(localOptions, localStrategyHandler);
+const jwtLogin = new JwtStrategy(jwtOptions, jwtStrategyHandler);
 
 passport.use(jwtLogin);
 passport.use(localLogin);
 
 function localStrategyHandler(email, password, done) {
-  User.findOne({
+  models.UserModel.findOne({
     email: email
-  }, localLoginHandler)
-});
-
-function localLoginHandler(err, user) {
-  if (err) {
-    return done(err);
-  }
-  if (!user) {
-    return done(null, false, {
-      error: 'Your login details could not be verified. Please try again.'
-    });
-  }
-
-  user.comparePassword(password, function (err, isMatch) {
+  }, function (err, user) {
     if (err) {
       return done(err);
     }
-    if (!isMatch) {
+    if (!user) {
       return done(null, false, {
-        error: "Your login details could not be verified. Please try again."
+        error: 'Your login details could not be verified. Please try again.'
       });
     }
 
-    return done(null, user);
+    user.comparePassword(password, function (err, isMatch) {
+      if (err) {
+        return done(err);
+      }
+      if (!isMatch) {
+        return done(null, false, {
+          error: 'Your login details could not be verified. Please try again.'
+        });
+      }
+
+      return done(null, user);
+    });
   });
 }
 
-// Setting up JWT login strategy
-
-const jwtOptions = {
-  // Telling Passport to check authorization headers for JWT
-  jwtFromRequest: ExtractJwt.fromAuthHeader(),
-  // Telling Passport where to find the secret
-  secretOrKey: config.secret
-};
-
-
-function jwtLoginHandler(payload, done) {
-  User.findById(payload._id, function (err, user) {
+function jwtStrategyHandler(payload, done) {
+  models.UserModel.findById(payload._id, function (err, user) {
     if (err) {
       return done(err, false);
     }
@@ -70,4 +71,4 @@ function jwtLoginHandler(payload, done) {
       done(null, false);
     }
   });
-});
+}

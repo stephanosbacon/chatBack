@@ -1,9 +1,10 @@
 'use strict';
 
-let mongoose = require('mongoose');
-let bcrypt = require('bcrypt-nodejs');
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt-nodejs');
+const Schema = mongoose.Schema;
 
-let Schema = mongoose.Schema;
+let Status = include('util/status');
 
 let UserSchema = new Schema({
   profile: {
@@ -58,15 +59,6 @@ UserSchema.pre('save', function (next) {
   });
 });
 
-function Status(code, message, errObj) {
-  if (errObj === undefined) {
-    errObj = null;
-  }
-  this.code = code;
-  this.message = message;
-  this.err = errObj;
-}
-
 UserSchema.statics.register = function (obj, cb) {
   // Check for registration errors
   const email = obj.email;
@@ -82,15 +74,15 @@ UserSchema.statics.register = function (obj, cb) {
 
   if (!firstName || !lastName) {
     return cb(new Status(422,
-      firstName ? 'Missing lastName' : 'Missing firstName'), null);
+      firstName ? 'Missing lastName' : 'Missing firstName'));
   }
 
   if (!authType) {
-    return cb(new Status(422, 'Missing authentication'), null);
+    return cb(new Status(422, 'Missing authentication'));
   }
 
   if (authType === 'Local' && !password) {
-    return cb(new Status(422, 'Missing password'), null);
+    return cb(new Status(422, 'Missing password'));
   }
 
   let UserModel = mongoose.model('User');
@@ -155,7 +147,7 @@ UserSchema.statics.update = function (obj, cb) {
   UserModel.findOne({
     _id: _id
   }, function (err, User) {
-    if (err || !User || User.email != obj.email) {
+    if (err || !User || User.email !== obj.email) {
       cb(new Status(500, 'Error finding user', err), null);
     } else {
       User.profile.firstName =

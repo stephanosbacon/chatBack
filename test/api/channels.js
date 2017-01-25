@@ -38,7 +38,7 @@ describe('Test /api/channels', function () {
       .expect('Content-Type', /json/)
       .expect(200)
       .end(function (err, res) {
-        assert.equal(res.body.message, "Channel A channel created");
+        assert.equal(res.body.message, 'Channel A channel created');
         channelId = res.body.channelId;
         done(err);
       });

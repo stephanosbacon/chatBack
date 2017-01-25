@@ -126,7 +126,7 @@ describe('Test user model - register', function () {
     let u1 = {
       email: 'bar@quux.com',
       firstName: 'William Cromwell',
-      lastName: "Fields jr.",
+      lastName: 'Fields jr.',
       status: 'Alive and well and living in Queens',
       authentication: 'Local'
     };
@@ -142,7 +142,7 @@ describe('Test user model - register', function () {
     let u1 = {
       email: 'bar@quux.com',
       firstName: 'William Cromwell',
-      lastName: "Fields jr.",
+      lastName: 'Fields jr.',
       status: 'Alive and well and living in Queens',
       password: 'Mart1n1'
     };
@@ -155,7 +155,6 @@ describe('Test user model - register', function () {
   });
 
 });
-
 
 describe('Test user model - update', function () {
 

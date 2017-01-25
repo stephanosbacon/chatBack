@@ -1,47 +1,27 @@
-let express = require('express');
-let path = require('path');
-let favicon = require('serve-favicon');
-let logger = require('morgan');
-let cookieParser = require('cookie-parser');
-let bodyParser = require('body-parser');
-let session = require('cookie-session');
+'use strict';
 
-let app = express();
-
+const express = require('express');
+const logger = require('morgan');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
 include('models/mongoose.js');
+include('auth/passport.js');
 
-let expiryDate = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
-app.use(session({
-  name: 'session',
-  keys: ['key1', 'key2'],
-  cookie: {
-    // secure: true,
-    httpOnly: true,
-    // domain: 'example.com',
-    // path: 'foo/bar',
-    expires: expiryDate
-  }
-}));
+const app = express();
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
-
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
+
 app.use(bodyParser.urlencoded({
   extended: false
 }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
 
 include('routes')(app);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-  let err = new Error('Not Found');
+  const err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
@@ -51,6 +31,7 @@ app.use(function (req, res, next) {
 app.use((err, req, res, next) => {
   if (err) {
     console.log(err);
+    next(err);
   }
   console.log('Should be returning 403');
   res.status(403)

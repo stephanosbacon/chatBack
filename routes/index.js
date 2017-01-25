@@ -1,11 +1,6 @@
-/**
- * Main application routes
- */
-
 'use strict';
 
-var path = require('path');
-
+// const debug = require('debug')('chatBack/routes/index');
 
 module.exports = function (app) {
   app.all('*', function (req, res, next) {
@@ -15,4 +10,4 @@ module.exports = function (app) {
   // Insert routes below
   app.use('/api/users', require('./users'));
   app.use('/api/channels', require('./Channels'));
-}
+};

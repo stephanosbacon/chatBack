@@ -1,18 +1,22 @@
+'use strict';
+
 /**
- * configType - dev, testClient, prod - there should be a file in '.' called config-<configType>.js
- * The config files assume that they have access to the global functions abs_path and include defined
- * herein.
+ * configType - dev, testClient, prod - there should be a file in '.'
+ * called config-<configType>.js
+ * The config files assume that they have access to the global functions
+ * abs_path and include defined herein.
  */
 function config(configType) {
 
-  let base_dir = process.cwd();
+  let baseDir = process.cwd();
 
-  global.abs_path = function (path) {
-    return base_dir + '/' + path;
-  }
+  global.absPath = function (path) {
+    return baseDir + '/' + path;
+  };
+
   global.include = function (file) {
-    return require(abs_path(file));
-  }
+    return require(global.absPath(file));
+  };
 
   /**
    * Normalize a port into a number, string, or false.
@@ -20,7 +24,7 @@ function config(configType) {
 
   global.config = include('config/config-' + configType + '.js');
   global.config.include = global.include;
-  global.config.abs_path = global.abs_path;
+  global.config.absPath = global.absPath;
 
   return global.config;
 }
