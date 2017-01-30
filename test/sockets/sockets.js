@@ -1,16 +1,15 @@
-"use strict";
+'use strict';
 
-let config = require(process.cwd() + '/config')('testClient');
-let include = config.include;
+const config = require(process.cwd() + '/config')('testClient');
+const include = config.include;
 
-let request = require('supertest');
-let should = require('should');
-let express = require('express');
-let assert = require('assert');
+const request = require('supertest');
+const should = require('should');
+const assert = require('assert');
 
-let req = request(config.serverUrl);
+const req = request(config.serverUrl);
 
-let models = include('models/mongoose.js');
+const models = include('models/mongoose.js');
 
 let Users;
 
@@ -50,7 +49,7 @@ describe('socket', function () {
         cookie2 = res.headers['set-cookie'][0];
         user2 = res.body;
         done(err);
-      })
+      });
   });
 
   it('get channels for a user', function (done) {
@@ -74,7 +73,7 @@ describe('socket', function () {
       .expect('Content-Type', /json/)
       .expect(200)
       .end(function (err, res) {
-        assert.equal(res.body.message, "Channel A channel created");
+        assert.equal(res.body.message, 'Channel A channel created');
         channelId = res.body.channelId;
         done(err);
       });

@@ -1,16 +1,9 @@
-"use strict";
+'use strict';
 
 let config = require(process.cwd() + '/config')('testClient');
-let include = config.include;
 
 let request = require('supertest');
-let should = require('should');
-let express = require('express');
 let assert = require('assert');
-
-
-let models = include('models/mongoose.js');
-
 
 let req = request(config.serverUrl);
 
@@ -22,8 +15,8 @@ describe('Test invalid urls', function () {
         assert.equal(res.body.message, 'unknown url');
 
       })
-      .end((err, res) => {
-        done(err)
+      .end((err) => {
+        done(err);
       });
   });
   it('empty path', function (done) {
@@ -32,8 +25,8 @@ describe('Test invalid urls', function () {
       .expect((res) => {
         assert.equal(res.body.message, 'unknown url');
       })
-      .end((err, res) => {
-        done(err)
+      .end((err) => {
+        done(err);
       });
   });
   it('empty path', function (done) {
@@ -42,8 +35,8 @@ describe('Test invalid urls', function () {
       .expect((res) => {
         assert.equal(res.body.message, 'unknown url');
       })
-      .end((err, res) => {
-        done(err)
+      .end((err) => {
+        done(err);
       });
   });
   it('invalid path', function (done) {
@@ -53,8 +46,8 @@ describe('Test invalid urls', function () {
         assert.equal(res.body.message, 'unknown url');
 
       })
-      .end((err, res) => {
-        done(err)
+      .end((err) => {
+        done(err);
       });
   });
   it('invalid path', function (done) {
@@ -63,8 +56,8 @@ describe('Test invalid urls', function () {
       .expect((res) => {
         assert.equal(res.body.message, 'unknown url');
       })
-      .end((err, res) => {
-        done(err)
+      .end((err) => {
+        done(err);
       });
   });
   it('invalid path', function (done) {
@@ -73,8 +66,8 @@ describe('Test invalid urls', function () {
       .expect((res) => {
         assert.equal(res.body.message, 'unknown url');
       })
-      .end((err, res) => {
-        done(err)
+      .end((err) => {
+        done(err);
       });
   });
 });

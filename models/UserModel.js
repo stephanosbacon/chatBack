@@ -59,8 +59,7 @@ UserSchema.pre('save', function (next) {
   });
 });
 
-UserSchema.statics.register = function (obj, cb) {
-  // Check for registration errors
+function register(obj, cb) {
   const email = obj.email;
   const firstName = obj.firstName;
   const lastName = obj.lastName;
@@ -119,7 +118,7 @@ UserSchema.statics.register = function (obj, cb) {
         cb(new Status(201, 'All is well'), user);
       });
     });
-};
+}
 
 
 // Method to compare password for login
@@ -141,7 +140,7 @@ UserSchema.methods.comparePassword = function (candidatePassword, cb) {
  * updateable.
  *
  */
-UserSchema.statics.update = function (obj, cb) {
+function update(obj, cb) {
   let UserModel = mongoose.model('User');
   let _id = obj._id;
   UserModel.findOne({
@@ -164,7 +163,26 @@ UserSchema.statics.update = function (obj, cb) {
       });
     }
   });
+}
+
+const mm = mongoose.model('User', UserSchema);
+module.exports = {
+  mongooseModel: mm,
+  register: register,
+  update: update,
+  find: function (o) {
+    return mm.find(o);
+  },
+  remove: function (o) {
+    return mm.remove(o);
+  },
+  findByIdAndRemove: function (o, cb) {
+    return mm.findByIdAndRemove(o, cb);
+  },
+  findById: function (o, cb) {
+    return mm.findById(o, cb);
+  },
+  findOne: function (o, cb) {
+    return mm.findOne(o, cb);
+  }
 };
-
-
-module.exports = mongoose.model('User', UserSchema);

@@ -7,6 +7,8 @@ const bodyParser = require('body-parser');
 include('models/mongoose.js');
 include('auth/passport.js');
 
+let Status = include('util/status');
+
 const app = express();
 
 app.use(logger('dev'));
@@ -35,35 +37,8 @@ app.use((err, req, res, next) => {
   }
   console.log('Should be returning 403');
   res.status(403)
-    .json({
-      'message': 'unknown url'
-    })
+    .json(new Status(403, 'unknown url'))
     .end();
 });
-
-
-/*
-// development error handler
-// will print stacktrace
-if (app.get('env') === 'development') {
-  app.use(function (err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-      message: err.message,
-      error: err
-    });
-  });
-}
-
-// production error handler
-// no stacktraces leaked to user
-app.use(function (err, req, res, next) {
-  res.status(err.status || 500);
-  res.render('error', {
-    message: err.message,
-    error: {}
-  });
-});
-*/
 
 module.exports = app;

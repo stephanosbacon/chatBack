@@ -1,18 +1,33 @@
-"use strict";
+'use strict';
 
 var express = require('express');
 var router = express.Router();
 
 var ChannelController = include('controllers/ChannelController.js');
 
-router.get('/', ChannelController.list);
+// must be logged in
+router.get('/', ChannelController.getAllChannels);
+
+// must be logged in and be one of the users in the channel
 router.get('/:id/messages', ChannelController.showMessages);
+router.post('/:id/messages', ChannelController.addMessageToChannel);
+
+// must be logged in and be one of the users in the channel
 router.get('/:id/users', ChannelController.showUsers);
-router.get("/foruser/:userid", ChannelController.showChannelsForUser);
+
+// must be logged in, and must be the user specified by :userid
+router.get('/foruser/:userid', ChannelController.getChannelsForUser);
+
+// must be logged in, one of the users must be the logged in user
 router.post('/', ChannelController.create);
-router.post('/:id/messages', ChannelController.newMessage);
-router.put("/:id/users/:userid", ChannelController.addUser);
-router.delete('/:id', ChannelController.remove);
+
+// must be logged in.  In order to add a user to a channel,
+// the user must also be one of the users in the channel
+router.put('/:id/users/:userid', ChannelController.addUserToChannel);
+
+// must be logged in, and users can only remove themselves (so :id has to
+// be the login id)
+router.delete('/:id', ChannelController.removeUserFromChannel);
 
 router.all('/*', (req, res) => {
   return res.status(403)

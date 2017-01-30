@@ -1,8 +1,8 @@
 'use strict';
 
-const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-const UserModel = mongoose.model('User');
+const UserModel = include('models/UserModel.js');
+
 const handleErrorsAndDo = require('./handleErrorsAndDo.js');
 //const debug = require('debug')('chatBack/controllers/UserController');
 
@@ -14,7 +14,6 @@ function generateToken(user) {
   });
 }
 
-// Set user info from full user model
 function setUserInfo(user) {
   return {
     _id: user._id,
@@ -51,7 +50,9 @@ module.exports.login = function (req, res) {
 module.exports.list = function (req, res) {
   UserModel.find(handleErrorsAndDo(res,
     (Users) => {
-      res.json(simplifyUsers(Users))
+      let su = simplifyUsers(Users);
+      res.status(200)
+        .json(su)
         .end();
     }));
 };

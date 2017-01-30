@@ -1,90 +1,97 @@
-"use strict";
+'use strict';
 
 let config = require(process.cwd() + '/config')('testClient');
 let include = config.include;
 
 let request = require('supertest');
-let should = require('should');
-let express = require('express');
 let assert = require('assert');
 
 let models = include('models/mongoose.js');
 
 let req = request(config.serverUrl);
 
+let UsersToCreate = [{
+    'email': 'bob@gmail.com',
+    'firstName': 'bob',
+    'lastName': 'smith',
+    'status': 'new dood',
+    'password': 'p1',
+    'authentication': 'Local'
+  },
+  {
+    'email': 'sandy@gmail.com',
+    'firstName': 'sandy',
+    'lastName': 'smith',
+    'status': 'noo doodette',
+    'password': 'p2',
+    'authentication': 'Local'
+  },
+  {
+    'email': 'billy@gmail.com',
+    'firstName': 'billy',
+    'lastName': 'smith',
+    'status': 'the dude',
+    'password': 'p3',
+    'authentication': 'Local'
+  },
+  {
+    'email': 'betty@gmail.com',
+    'firstName': 'betty',
+    'lastName': 'smith',
+    'status': 'the dudette',
+    'password': 'p4',
+    'authentication': 'Local'
+  }
+];
+
 module.exports = function (callback) {
   let Users;
 
   describe('Create Users', function () {
+
     it('clear users', function (done) {
-      models.UserModel.find({})
-        .remove()
-        .then(models.UserModel.find({}, (err, docs) => {
-          assert.equal(null, err);
-          done(err);
-        }));
+      let clearUsers = include('test/util/clearUsers');
+      clearUsers(done);
     });
 
     it('create users', function (done) {
-      let count = 0;
-      let sayDone = function (err) {
-        count++;
-        if (count == 4) {
-          done(err);
-        }
+      let closure = function () {
+        let count = 0;
+        return function (user) {
+          models.UserModel.register(user,
+            function (status, User) {
+              assert.equal(status.code, 201);
+              assert.notEqual(User, null);
+              count++;
+              if (count === 4) {
+                done();
+              }
+            });
+        };
       };
+      UsersToCreate.forEach(closure());
+    });
 
-      models.UserModel.create({
-          "email": "bob@gmail.com",
-          "name": "bob"
-        },
-        function (err, User) {
-          assert.equal(err, null);
-          assert.notEqual(User, null);
-          sayDone(err);
-        });
+    let loginStuff;
 
-      models.UserModel.create({
-          "email": "sandy@gmail.com",
-          "name": "sandy"
-        },
-        function (err, User) {
-          assert.equal(err, null);
-          assert.notEqual(User, null);
-          sayDone(err);
-        });
-
-      models.UserModel.create({
-          "email": "billy@.com",
-          "name": "billy"
-        },
-        function (err, User) {
-          assert.equal(err, null);
-          assert.notEqual(User, null);
-          sayDone(err);
-        });
-
-      models.UserModel.create({
-          "email": "betty@.com",
-          "name": "betty"
-        },
-        function (err, User) {
-          assert.equal(err, null);
-          assert.notEqual(User, null);
-          sayDone(err);
-        });
+    it('login', function (done) {
+      include('test/util/login.js')('bob@gmail.com', 'p1', (ls, err) => {
+        loginStuff = ls;
+        done(err);
+      });
     });
 
     it('verify all users created', function (done) {
       req.get('/api/users')
+        .set('Authorization', loginStuff.token)
         .expect('Content-Type', /json/)
         .expect(200)
         .end(function (err, res) {
           Users = res.body;
-          assert(Users.length == 4);
+          assert(Users.length === 4);
           callback(Users);
           done(err);
         });
     });
   });
-}
+};

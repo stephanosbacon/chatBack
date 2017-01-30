@@ -12,10 +12,9 @@ let req = request(config.serverUrl);
 
 describe('Test local authentication/authorization - 1', function () {
 
-  it('clear', function (done) {
-    models.UserModel.find({})
-      .remove()
-      .then(done());
+  it('clear users', function (done) {
+    let clearUsers = include('test/util/clearUsers');
+    clearUsers(done);
   });
 
   it('register a user', function (done) {
@@ -44,19 +43,10 @@ describe('Test local authentication/authorization - 1', function () {
   let loginStuff;
 
   it('login', function (done) {
-    req.post('/api/users/login')
-      .send({
-        email: 'foo@bar.com',
-        password: 'Mart1n1'
-      })
-      .expect(200)
-      .end((err, res) => {
-        if (err) done(err);
-        assert.equal(res.body.token.startsWith('JWT '), true);
-        assert.equal(res.body.user.email, 'foo@bar.com');
-        loginStuff = res.body;
-        done();
-      });
+    include('test/util/login.js')('foo@bar.com', 'Mart1n1', (ls, err) => {
+      loginStuff = ls;
+      done(err);
+    });
   });
 
   it('test auth - list users', function (done) {

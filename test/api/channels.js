@@ -1,18 +1,13 @@
-"use strict";
+'use strict';
 
 let config = require(process.cwd() + '/config')('testClient');
 let include = config.include;
 
 let request = require('supertest');
-let should = require('should');
-let express = require('express');
 let assert = require('assert');
-let models = include('models/mongoose.js');
 
 let req = request(config.serverUrl);
 let Users;
-
-
 
 include('test/util/createUsers')((ret) => {
   Users = ret;
@@ -22,11 +17,8 @@ include('test/util/createUsers')((ret) => {
 describe('Test /api/channels', function () {
 
   let channelId;
-
   it('clear channels', function (done) {
-    models.ChannelModel.find({})
-      .remove()
-      .then(done());
+    include('test/util/clearChannels')(done);
   });
 
   it('create a channel', function (done) {
@@ -36,10 +28,10 @@ describe('Test /api/channels', function () {
         'name': 'A channel'
       })
       .expect('Content-Type', /json/)
-      .expect(200)
+      .expect(201)
       .end(function (err, res) {
         assert.equal(res.body.message, 'Channel A channel created');
-        channelId = res.body.channelId;
+        channelId = res.body._id;
         done(err);
       });
   });
@@ -54,22 +46,20 @@ describe('Test /api/channels', function () {
         assert.equal(res.body[0].users.length, 2, '2 users');
         assert.equal(res.body[0].users[0], Users[0]._id);
         done(err);
-      })
+      });
   });
 
   it('get channels for a user', function (done) {
     req.get('/api/channels/foruser/' + Users[0]._id)
       .expect(200)
       .end(function (err, res) {
-        if (err) {
-          throw err;
-        }
         assert.equal(res.body.length, 1, 'only one channel');
         assert.equal(res.body[0]._id, channelId, 'verify channel id');
-        assert.equal(res.body[0].messages.length, 0, 'no messages yet');
         done(err);
       });
   });
+
+  /*
 
   let newMessageResult;
   let cookie;
@@ -83,7 +73,7 @@ describe('Test /api/channels', function () {
       .end(function (err, res) {
         cookie = res.headers['set-cookie'][0];
         done(err);
-      })
+      });
   });
 
   it('add message to a channel', function (done) {
@@ -95,7 +85,7 @@ describe('Test /api/channels', function () {
       .expect(200)
       .end(function (err, res) {
         newMessageResult = res.body;
-        done(err)
+        done(err);
       });
   });
 
@@ -103,11 +93,15 @@ describe('Test /api/channels', function () {
     req.get('/api/channels/' + channelId + '/messages')
       .expect(200)
       .end(function (err, res) {
-        assert(res.body.messages.length == 1, 'single message returned');
-        assert(res.body.messages[0].postedBy == Users[0]._id, 'verify postedBy');
-        assert(res.body.messages[0].text == 'this is a message', 'verify text');
-        assert(res.body.messages[0].postedTime == newMessageResult.message.postedTime);
-        assert(new Date(res.body.messages[0].postedTime) != 'Invalid Date', 'make sure we got back a date');
+        assert(res.body.messages.length === 1, 'single message returned');
+        assert(res.body.messages[0].postedBy === Users[0]._id,
+          'verify postedBy');
+        assert(res.body.messages[0].text === 'this is a message',
+          'verify text');
+        assert(res.body.messages[0].postedTime ===
+          newMessageResult.message.postedTime);
+        assert(new Date(res.body.messages[0].postedTime) !==
+          'Invalid Date', 'make sure we got back a date');
         done(err);
       });
   });
@@ -126,7 +120,7 @@ describe('Test /api/channels', function () {
     req.get('/api/channels/' + channelId + '/users')
       .expect(200)
       .end(function (err, res) {
-        assert(res.body.users.length == 3);
+        assert(res.body.users.length === 3);
         done(err);
       });
 
@@ -140,5 +134,5 @@ describe('Test /api/channels', function () {
         done(err);
       });
   });
-
+  */
 });

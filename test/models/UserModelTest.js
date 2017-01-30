@@ -10,13 +10,8 @@ let assert = require('assert');
 describe('Test user model - register', function () {
 
   it('clear users', function (done) {
-    models.UserModel.find({})
-      .remove()
-      .then(models.UserModel.find({}, (err, docs) => {
-        assert.equal(null, err);
-        assert.equal(0, docs.length);
-        done(err);
-      }));
+    let clearUsers = include('test/util/clearUsers');
+    clearUsers(done);
   });
 
   it('register a user', function (done) {
@@ -158,14 +153,20 @@ describe('Test user model - register', function () {
 
 describe('Test user model - update', function () {
 
+
   it('clear users', function (done) {
-    models.UserModel.find({})
+    models.UserModel.mongooseModel.find({})
       .remove()
-      .then(models.UserModel.find({}, (err, docs) => {
-        assert.equal(null, err);
-        assert.equal(0, docs.length);
+      .exec()
+      .then(models.UserModel.find({})
+        .exec()
+        .then((docs) => {
+          assert.equal(0, docs.length);
+          done();
+        }))
+      .catch((err) => {
         done(err);
-      }));
+      });
   });
 
   it('register a user', function (done) {
