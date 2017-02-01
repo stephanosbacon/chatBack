@@ -2,8 +2,6 @@
 
 var models = include('models/mongoose.js');
 
-var handleErrorsAndDo = require('./handleErrorsAndDo.js');
-
 function simplifyChannel(channel) {
   return {
     name: channel.name,
@@ -37,36 +35,32 @@ module.exports.getChannelsForUser = function (req, res) {
 
 module.exports.showUsers = function (req, res) {
   var id = req.params.id;
-  models.ChannelModel.findOne({
-      _id: id
-    },
-    handleErrorsAndDo(res,
-      (channel) => {
-        res.status(200)
-          .json({
-            '_id': channel._id,
-            'users': channel.users,
-            'name': channel.name
-          })
+  models.ChannelModel.getChannel(id,
+    (status, channel) => {
+      if (channel != null) {
+        res.status(status.code)
+          .json(channel.users)
           .end();
-      }));
+      } else {
+        res.status(status.code)
+          .end();
+      }
+    });
 };
 
 module.exports.showMessages = function (req, res) {
   var id = req.params.id;
-  models.ChannelModel.findOne({
-      _id: id
-    },
-    handleErrorsAndDo(res,
-      (channel) => {
-        res.status(200)
-          .json({
-            '_id': channel._id,
-            'name': channel.name,
-            'messages': channel.messages
-          })
+  models.ChannelModel.getChannel(id,
+    (status, channel) => {
+      if (channel != null) {
+        res.status(status.code)
+          .json(channel)
           .end();
-      }));
+      } else {
+        res.status(status.code)
+          .end();
+      }
+    });
 };
 
 module.exports.create = function (req, res) {

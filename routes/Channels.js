@@ -62,15 +62,6 @@ router.get('/', auth.requireAuth, ChannelController.getAllChannels);
 router.post('/', auth.requireAuth, currentUserMustBeInNewChannel,
   ChannelController.create);
 
-
-// must be logged in and be one of the users in the channel
-router.get('/:id/messages',
-  auth.requireAuth, setCurrentChannel,
-  currentUserInChannel, ChannelController.showMessages);
-router.post('/:id/messages',
-  auth.requireAuth, setCurrentChannel,
-  currentUserInChannel, ChannelController.addMessageToChannel);
-
 // must be logged in and be one of the users in the channel
 router.get('/:id/users',
   auth.requireAuth,
@@ -80,6 +71,14 @@ router.get('/:id/users',
 router.get('/foruser/:id',
   auth.requireAuth, auth.authorizeCurrentUser,
   ChannelController.getChannelsForUser);
+
+// must be logged in and be one of the users in the channel
+router.get('/:id/messages',
+  auth.requireAuth, setCurrentChannel,
+  currentUserInChannel, ChannelController.showMessages);
+router.post('/:id/messages',
+  auth.requireAuth, setCurrentChannel,
+  currentUserInChannel, ChannelController.addMessageToChannel);
 
 // must be logged in.  In order to add a user to a channel,
 // the user must also be one of the users in the channel

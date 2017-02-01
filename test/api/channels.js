@@ -17,6 +17,7 @@ include('test/util/createUsers')((ret) => {
 describe('Test /api/channels', function () {
 
   let channelId;
+
   it('clear channels', function (done) {
     include('test/util/clearChannels')(done);
   });
@@ -48,6 +49,16 @@ describe('Test /api/channels', function () {
       loginStuff1 = ls;
       done(err);
     });
+  });
+
+  it('get channels for a user', function (done) {
+    req.get('/api/channels/foruser/' + Users[0]._id)
+      .set('Authorization', loginStuff1.token)
+      .expect(200)
+      .end(function (err, res) {
+        assert.equal(res.body.length, 0, 'no channels');
+        done(err);
+      });
   });
 
   it('create a channel', function (done) {
@@ -118,80 +129,121 @@ describe('Test /api/channels', function () {
       });
   });
 
-  /*
-
-  let newMessageResult;
-  let cookie;
-
-  it('do a login', function (done) {
-    req.post('/api/users/login')
-      .send({
-        'email': Users[0].email
-      })
+  it('get users in a channel', function (done) {
+    req.get('/api/channels/' + channelId + '/users')
+      .set('Authorization', loginStuff1.token)
       .expect(200)
       .end(function (err, res) {
-        cookie = res.headers['set-cookie'][0];
+        assert.equal(res.body.length, 2);
         done(err);
       });
   });
 
   it('add message to a channel', function (done) {
-    let call = req.post('/api/channels/' + channelId + '/messages');
-    call.cookies = cookie;
-    call.send({
+    req.post('/api/channels/' + channelId + '/messages')
+      .set('Authorization', loginStuff1.token)
+      .send({
         'message': 'this is a message'
       })
-      .expect(200)
-      .end(function (err, res) {
-        newMessageResult = res.body;
-        done(err);
+      .expect(201)
+      .end((err, res) => {
+        assert.equal(err, null);
+        let msg = res.body;
+        assert.equal(msg.text, 'this is a message');
+        assert.equal(msg.postedBy, Users[0]._id);
+        assert.notEqual(msg.postedTime, null);
+        assert.equal(msg.channelId, channelId1);
+        done();
       });
   });
+});
 
-  it('verify that the message was added', function (done) {
-    req.get('/api/channels/' + channelId + '/messages')
-      .expect(200)
-      .end(function (err, res) {
-        assert(res.body.messages.length === 1, 'single message returned');
-        assert(res.body.messages[0].postedBy === Users[0]._id,
-          'verify postedBy');
-        assert(res.body.messages[0].text === 'this is a message',
-          'verify text');
-        assert(res.body.messages[0].postedTime ===
-          newMessageResult.message.postedTime);
-        assert(new Date(res.body.messages[0].postedTime) !==
-          'Invalid Date', 'make sure we got back a date');
-        done(err);
-      });
+
+it('get messages in a channel - returns the full channel', function (done) {
+req.get('/api/channels/' + channelId + '/messages')
+  .set('Authorization', loginStuff1.token)
+  .expect(200)
+  .end(function (err, res) {
+    assert.equal(res.body.messages.length, 1);
+    assert.equal(res.body.messages[0].text, 'this is a message');
+    done(err);
   });
+});
 
-  it('add a user to a channel', function (done) {
-    req.put('/api/channels/' + channelId + '/users/' + Users[2]._id)
-      .expect(200)
-      .end(function (err, res) {
-        assert.equal(res.body.channelId, channelId);
-        assert.equal(res.body.message, 'user ' + Users[2]._id + ' added');
-        done(err);
-      });
-  });
+/*
 
-  it('verify that the user was added', function (done) {
-    req.get('/api/channels/' + channelId + '/users')
-      .expect(200)
-      .end(function (err, res) {
-        assert(res.body.users.length === 3);
-        done(err);
-      });
+let newMessageResult;
+let cookie;
 
-  });
+it('do a login', function (done) {
+  req.post('/api/users/login')
+    .send({
+      'email': Users[0].email
+    })
+    .expect(200)
+    .end(function (err, res) {
+      cookie = res.headers['set-cookie'][0];
+      done(err);
+    });
+});
 
-  it('try dummy route', function (done) {
-    req.get('/api/channels/dummy')
-      .expect(403)
-      .end(function (err, res) {
-        assert.equal(res.body.message, 'unknown url');
-        done(err);
-      });
-  });
-  */
+it('add message to a channel', function (done) {
+  let call = req.post('/api/channels/' + channelId + '/messages');
+  call.cookies = cookie;
+  call.send({
+      'message': 'this is a message'
+    })
+    .expect(200)
+    .end(function (err, res) {
+      newMessageResult = res.body;
+      done(err);
+    });
+});
+
+it('verify that the message was added', function (done) {
+  req.get('/api/channels/' + channelId + '/messages')
+    .expect(200)
+    .end(function (err, res) {
+      assert(res.body.messages.length === 1, 'single message returned');
+      assert(res.body.messages[0].postedBy === Users[0]._id,
+        'verify postedBy');
+      assert(res.body.messages[0].text === 'this is a message',
+        'verify text');
+      assert(res.body.messages[0].postedTime ===
+        newMessageResult.message.postedTime);
+      assert(new Date(res.body.messages[0].postedTime) !==
+        'Invalid Date', 'make sure we got back a date');
+      done(err);
+    });
+});
+
+it('add a user to a channel', function (done) {
+  req.put('/api/channels/' + channelId + '/users/' + Users[2]._id)
+    .expect(200)
+    .end(function (err, res) {
+      assert.equal(res.body.channelId, channelId);
+      assert.equal(res.body.message, 'user ' + Users[2]._id + ' added');
+      done(err);
+    });
+});
+
+it('verify that the user was added', function (done) {
+  req.get('/api/channels/' + channelId + '/users')
+    .expect(200)
+    .end(function (err, res) {
+      assert(res.body.users.length === 3);
+      done(err);
+    });
+
+});
+
+it('try dummy route', function (done) {
+  req.get('/api/channels/dummy')
+    .expect(403)
+    .end(function (err, res) {
+      assert.equal(res.body.message, 'unknown url');
+      done(err);
+    });
+});
+*/
 });
