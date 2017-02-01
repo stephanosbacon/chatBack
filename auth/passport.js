@@ -25,12 +25,6 @@ const jwtOptions = {
 };
 
 const jwtToken = require('jsonwebtoken');
-module.exports.verifyJwtToken = function (token) {
-  let t = token.substring(4);
-  const decoded = jwtToken.verify(t, config.secrets.jwtSecret);
-  return decoded;
-};
-
 
 const localLogin = new LocalStrategy(localOptions, localStrategyHandler);
 const jwtLogin = new JwtStrategy(jwtOptions, jwtStrategyHandler);
@@ -79,3 +73,35 @@ function jwtStrategyHandler(payload, done) {
     }
   });
 }
+
+
+module.exports.verifyJwtToken = function (token) {
+  if (token == null) return null;
+  console.log(token);
+  let t = token.substring(4);
+  const decoded = jwtToken.verify(t, config.secrets.jwtSecret);
+  return decoded;
+};
+
+// Middleware to require login/auth
+module.exports.requireAuth = passport.authenticate('jwt', {
+  session: false
+});
+
+module.exports.requireLogin = passport.authenticate('local', {
+  session: false
+});
+
+module.exports.authorizeCurrentUser = function (req, res, next) {
+  if (JSON.stringify(req.params.id) !== JSON.stringify(req.user._id)) {
+    res.status(401)
+      .json(new Status(401, 'not authorized'))
+      .end();
+  } else {
+    next();
+  }
+};
+
+
+
+module.exports.requireAuth =

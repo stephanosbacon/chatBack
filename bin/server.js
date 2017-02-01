@@ -18,6 +18,9 @@ server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
+app.server = server;
+
+
 const url = require('url');
 const queryString = require('query-string');
 const ws = require('ws');
@@ -35,7 +38,8 @@ const wss = new WebSocketServer({
   'verifyClient': function (info) {
     let parsedUrl = url.parse(info.req.url);
     let parsedQuery = queryString.parse(parsedUrl.query);
-    let userInfo = verifyJwtToken(parsedQuery);
+    let userInfo = verifyJwtToken(parsedQuery.token);
+    if (userInfo == null) return false;
     if (!userSocketMap[userInfo._id]) {
       userSocketMap[userInfo._id] = {
         sockets: []
@@ -46,7 +50,6 @@ const wss = new WebSocketServer({
   }
 });
 
-app.server = server;
 app.webSocketServer = wss;
 
 wss.broadcast = function (channel, message) {

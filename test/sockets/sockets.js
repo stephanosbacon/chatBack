@@ -14,14 +14,16 @@ include('test/util/createUsers')((ret) => {
   Users = ret;
 });
 
-describe('socket', function () {
+describe('socket tests', function () {
 
-  let loginStuff;
+  let loginStuff1;
   let channelId;
+  let socket1;
+  let socket2;
 
   it('login', function (done) {
     include('test/util/login.js')('bob@gmail.com', 'p1', (ls, err) => {
-      loginStuff = ls;
+      loginStuff1 = ls;
       done(err);
     });
   });
@@ -41,33 +43,35 @@ describe('socket', function () {
       });
   });
 
-  describe('create a socket', function () {
-
-    it('baaaa', function (done) {
-      let WS = require('ws');
-      socket1 = new WS('wss://localhost:3000/api/channels?token=' +
-        loginStuff.token, {}, {});
-      socket1.on('message', function msg(message) {
-        console.log('got one ' + JSON.stringify(message));
-        done();
-      });
+  it('create a socket', function (done) {
+    let WS = require('ws');
+    socket1 = new WS('wss://localhost:3000/api/channels?token=' +
+      loginStuff1.token, {}, {});
+    socket1.on('message', function msg(message) {
+      console.log('got one ' + JSON.stringify(message));
+      done();
     });
   });
-});
 
-it('add message to a channel', function (done) {
-  let call = req.post('/api/channels/' + channelId + '/messages');
-  call.cookies = cookie1;
-  call.send({
-      'message': 'this is a message see if user 2 gets it'
-    })
-    .expect(200)
-    .end(function (err, res) {
-      newMessageResult = res.body;
-      done(err);
-    });
+  it('add message to a channel', function (done) {
+    let validator = function (message) {
+      assert.equal(message, 'this is a message');
+      console.log('validator 1' - message);
+    };
+    socket1.on('message', validator);
+    req.post('/api/channels/' + channelId + '/messages')
+      .set('Authorization', loginStuff1.token)
+      .send({
+        'message': 'this is a message'
+      })
+      .expect(200)
+      .end(function (err, res) {
+        console.log(res.body);
+        socket1.removeListener('message', validator);
+        done(err);
+      });
+  });
 });
-
 
 /*
 
