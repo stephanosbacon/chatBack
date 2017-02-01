@@ -51,7 +51,7 @@ app.webSocketServer = wss;
 
 wss.broadcast = function (channel, message) {
   channel.users.forEach((item) => {
-    if ((item !== message.postedBy) && (userSocketMap[item])) {
+    if (userSocketMap[item]) {
       userSocketMap[item].sockets.forEach((item) => {
         item.send(JSON.stringify(message));
       });
