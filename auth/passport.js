@@ -24,6 +24,13 @@ const jwtOptions = {
   secretOrKey: config.secrets.jwtSecret
 };
 
+const jwtToken = require('jsonwebtoken');
+module.exports.verifyJwtToken = function (token) {
+  let t = token.substring(4);
+  const decoded = jwtToken.verify(t, config.secrets.jwtSecret);
+  return decoded;
+};
+
 
 const localLogin = new LocalStrategy(localOptions, localStrategyHandler);
 const jwtLogin = new JwtStrategy(jwtOptions, jwtStrategyHandler);

@@ -4,12 +4,9 @@ const config = require(process.cwd() + '/config')('testClient');
 const include = config.include;
 
 const request = require('supertest');
-const should = require('should');
 const assert = require('assert');
 
 const req = request(config.serverUrl);
-
-const models = include('models/mongoose.js');
 
 let Users;
 
@@ -19,49 +16,14 @@ include('test/util/createUsers')((ret) => {
 
 describe('socket', function () {
 
-  let cookie1,
-    cookie2,
-    user1,
-    user2,
-    channelId,
-    newMessageResult,
-    socket1,
-    socket2;
+  let loginStuff;
+  let channelId;
 
-  it('do the logins', function (done) {
-
-    req.post('/api/users/login')
-      .send({
-        'email': Users[0].email
-      })
-      .expect(200)
-      .end(function (err, res) {
-        cookie1 = res.headers['set-cookie'][0];
-        user1 = res.body;
-      });
-
-    req.post('/api/users/login')
-      .send({
-        'email': Users[1].email
-      })
-      .expect(200)
-      .end(function (err, res) {
-        cookie2 = res.headers['set-cookie'][0];
-        user2 = res.body;
-        done(err);
-      });
-  });
-
-  it('get channels for a user', function (done) {
-    req.get('/api/channels/foruser/' + Users[0]._id)
-      .expect(200)
-      .end(function (err, res) {
-        if (err) {
-          throw err;
-        }
-        assert.equal(res.body.length, 0, 'no channels yet');
-        done(err);
-      });
+  it('login', function (done) {
+    include('test/util/login.js')('bob@gmail.com', 'p1', (ls, err) => {
+      loginStuff = ls;
+      done(err);
+    });
   });
 
   it('create a channel', function (done) {
@@ -71,10 +33,52 @@ describe('socket', function () {
         'name': 'A channel'
       })
       .expect('Content-Type', /json/)
-      .expect(200)
+      .expect(201)
       .end(function (err, res) {
         assert.equal(res.body.message, 'Channel A channel created');
-        channelId = res.body.channelId;
+        channelId = res.body._id;
+        done(err);
+      });
+  });
+
+  describe('create a socket', function () {
+
+    it('baaaa', function (done) {
+      let WS = require('ws');
+      socket1 = new WS('wss://localhost:3000/api/channels?token=' +
+        loginStuff.token, {}, {});
+      socket1.on('message', function msg(message) {
+        console.log('got one ' + JSON.stringify(message));
+        done();
+      });
+    });
+  });
+});
+
+it('add message to a channel', function (done) {
+  let call = req.post('/api/channels/' + channelId + '/messages');
+  call.cookies = cookie1;
+  call.send({
+      'message': 'this is a message see if user 2 gets it'
+    })
+    .expect(200)
+    .end(function (err, res) {
+      newMessageResult = res.body;
+      done(err);
+    });
+});
+
+
+/*
+
+  it('get channels for a user', function (done) {
+    req.get('/api/channels/foruser/' + Users[0]._id)
+      .expect(200)
+      .end(function (err, res) {
+        if (err) {
+          throw err;
+        }
+        assert.equal(res.body.length, 0, 'no channels yet');
         done(err);
       });
   });
@@ -135,19 +139,6 @@ describe('socket', function () {
 
   it('add message to a channel', function (done) {
     let call = req.post('/api/channels/' + channelId + '/messages');
-    call.cookies = cookie1;
-    call.send({
-        'message': 'this is a message see if user 2 gets it'
-      })
-      .expect(200)
-      .end(function (err, res) {
-        newMessageResult = res.body;
-        done(err)
-      });
-  });
-
-  it('add message to a channel', function (done) {
-    let call = req.post('/api/channels/' + channelId + '/messages');
     call.cookies = cookie2;
     call.send({
         'message': 'this is a message see if user 1 gets it'
@@ -158,4 +149,4 @@ describe('socket', function () {
         done(err)
       });
   });
-});
+  */

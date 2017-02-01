@@ -13,56 +13,51 @@ app.set('port', port);
  * Create HTTP server.
  */
 
-let server = https.createServer(options, app);
-app.server = server;
-
-
-
-/**
- * Listen on provided port, on all network interfaces.
- */
-
+const server = https.createServer(options, app);
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
-// let url = require('url');
-let WebSocketServer = require('ws')
-  .Server;
-let wss = new WebSocketServer({
-  'server': server
-});
+const url = require('url');
+const queryString = require('query-string');
+const ws = require('ws');
 
-let userSocketMap = {};
 
-wss.on('connection', function connection(ws) {
-  // let location = url.parse(ws.upgradeReq.url, true);
-  // you might use location.query.access_token to authenticate or share sessions
-  // or ws.upgradeReq.headers.cookie
-  //  (see http://stackoverflow.com/a/16395220/151312)
+const WebSocketServer = ws.Server;
 
-  ws.on('message', function incoming(message /*, flags */ ) {
-    let obj = JSON.parse(message);
-    console.log('#Websocket connection from user: ', message);
-    if (!userSocketMap[obj._id]) {
-      userSocketMap[obj._id] = {
+const auth = include('auth/passport');
+const verifyJwtToken = auth.verifyJwtToken;
+const userSocketMap = {};
+
+const wss = new WebSocketServer({
+  'server': server,
+  'path': '/api/channels',
+  'verifyClient': function (info) {
+    let parsedUrl = url.parse(info.req.url);
+    let parsedQuery = queryString.parse(parsedUrl.query);
+    let userInfo = verifyJwtToken(parsedQuery);
+    if (!userSocketMap[userInfo._id]) {
+      userSocketMap[userInfo._id] = {
         sockets: []
       };
     }
-    userSocketMap[obj._id].sockets.push(ws);
-  });
+    userSocketMap[userInfo._id].sockets.push(ws);
+    return true;
+  }
 });
 
-server.broadcast = function (channel, message) {
-  channel.users.forEach((item /*, index */ ) => {
+app.server = server;
+app.webSocketServer = wss;
+
+wss.broadcast = function (channel, message) {
+  channel.users.forEach((item) => {
     if ((item !== message.postedBy) && (userSocketMap[item])) {
-      userSocketMap[item].sockets.forEach((item /*, index */ ) => {
+      userSocketMap[item].sockets.forEach((item) => {
         item.send(JSON.stringify(message));
       });
     }
   });
 };
-
 
 /**
  * Event listener for HTTP server "error" event.

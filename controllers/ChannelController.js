@@ -86,7 +86,6 @@ module.exports.create = function (req, res) {
 };
 
 
-// TODO - re-add the broadcast...
 module.exports.addMessageToChannel = function (req, res) {
   let channelId = req.params.id;
   let postedBy = req.user._id;
@@ -97,7 +96,7 @@ module.exports.addMessageToChannel = function (req, res) {
         .json(msg)
         .end();
       if (status.code === 201) {
-        res.app.server.broadcast(channelId, msg);
+        res.app.webSocketServer.broadcast(channelId, msg);
       }
     });
 };

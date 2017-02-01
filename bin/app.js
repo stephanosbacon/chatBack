@@ -11,6 +11,9 @@ let Status = include('util/status');
 
 const app = express();
 
+const expressWs = require('express-ws');
+expressWs(app, app.server);
+
 app.use(logger('dev'));
 app.use(bodyParser.json());
 
