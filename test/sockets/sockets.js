@@ -17,9 +17,8 @@ include('test/util/createUsers')((ret) => {
 describe('socket tests', function () {
 
   let loginStuff1;
-  let channelId;
+  let channelId1;
   let socket1;
-  let socket2;
 
   it('login', function (done) {
     include('test/util/login.js')('bob@gmail.com', 'p1', (ls, err) => {
@@ -30,6 +29,7 @@ describe('socket tests', function () {
 
   it('create a channel', function (done) {
     req.post('/api/channels')
+      .set('Authorization', loginStuff1.token)
       .send({
         'users': [Users[0]._id, Users[1]._id],
         'name': 'A channel'
@@ -38,7 +38,7 @@ describe('socket tests', function () {
       .expect(201)
       .end(function (err, res) {
         assert.equal(res.body.message, 'Channel A channel created');
-        channelId = res.body._id;
+        channelId1 = res.body._id;
         done(err);
       });
   });
@@ -47,28 +47,32 @@ describe('socket tests', function () {
     let WS = require('ws');
     socket1 = new WS('wss://localhost:3000/api/channels?token=' +
       loginStuff1.token, {}, {});
-    socket1.on('message', function msg(message) {
-      console.log('got one ' + JSON.stringify(message));
-      done();
-    });
+    done();
   });
 
   it('add message to a channel', function (done) {
     let validator = function (message) {
-      assert.equal(message, 'this is a message');
-      console.log('validator 1' - message);
+      let msg = JSON.parse(message);
+      assert.equal(msg.text, 'this is a message');
+      assert.equal(msg.postedBy, Users[0]._id);
+      assert.notEqual(msg.postedTime, null);
+      assert.equal(msg.channelId, channelId1);
+      done();
     };
     socket1.on('message', validator);
-    req.post('/api/channels/' + channelId + '/messages')
+    req.post('/api/channels/' + channelId1 + '/messages')
       .set('Authorization', loginStuff1.token)
       .send({
         'message': 'this is a message'
       })
-      .expect(200)
-      .end(function (err, res) {
-        console.log(res.body);
-        socket1.removeListener('message', validator);
-        done(err);
+      .expect(201)
+      .end((err, res) => {
+        assert.equal(err, null);
+        let msg = res.body;
+        assert.equal(msg.text, 'this is a message');
+        assert.equal(msg.postedBy, Users[0]._id);
+        assert.notEqual(msg.postedTime, null);
+        assert.equal(msg.channelId, channelId1);
       });
   });
 });

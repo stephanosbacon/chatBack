@@ -6,9 +6,9 @@ let config = require(process.cwd() + '/config')('testClient');
 let include = config.include;
 
 
-//include('test/models/UserModelTest.js');
+include('test/models/UserModelTest.js');
 include('test/api/users');
-//include('test/models/ChannelModelTest.js');
-//include('test/api/channels');
+include('test/models/ChannelModelTest.js');
+include('test/api/channels');
 require('./sockets/sockets.js');
-//require('./api/invalidPaths');
+require('./api/invalidPaths');

@@ -9,10 +9,6 @@ let port = config.port;
 
 app.set('port', port);
 
-/**
- * Create HTTP server.
- */
-
 const server = https.createServer(options, app);
 server.listen(port);
 server.on('error', onError);
@@ -32,29 +28,38 @@ const auth = include('auth/passport');
 const verifyJwtToken = auth.verifyJwtToken;
 const userSocketMap = {};
 
+function getUserInfoFromUrl(youAreEl) {
+  let parsedUrl = url.parse(youAreEl);
+  let parsedQuery = queryString.parse(parsedUrl.query);
+  let userInfo = verifyJwtToken(parsedQuery.token);
+  return userInfo;
+}
+
 const wss = new WebSocketServer({
   'server': server,
   'path': '/api/channels',
   'verifyClient': function (info) {
-    let parsedUrl = url.parse(info.req.url);
-    let parsedQuery = queryString.parse(parsedUrl.query);
-    let userInfo = verifyJwtToken(parsedQuery.token);
+    let userInfo = getUserInfoFromUrl(info.req.url);
     if (userInfo == null) return false;
     if (!userSocketMap[userInfo._id]) {
       userSocketMap[userInfo._id] = {
         sockets: []
       };
     }
-    userSocketMap[userInfo._id].sockets.push(ws);
     return true;
   }
+});
+
+wss.on('connection', (ws) => {
+  let userInfo = getUserInfoFromUrl(ws.upgradeReq.url);
+  userSocketMap[userInfo._id].sockets.push(ws);
 });
 
 app.webSocketServer = wss;
 
 wss.broadcast = function (channel, message) {
   channel.users.forEach((item) => {
-    if (userSocketMap[item]) {
+    if (userSocketMap[item] && userSocketMap[item].sockets != null) {
       userSocketMap[item].sockets.forEach((item) => {
         item.send(JSON.stringify(message));
       });

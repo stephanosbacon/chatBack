@@ -129,13 +129,12 @@ function addMessageToChannel(channelId, postedBy, message, cb) {
         postedTime: new Date()
       };
       channel.messages.push(msg);
-      channel.save((err, savedChannel) => {
+      channel.save((err) => {
         if (err != null) {
           cb(new Status(500, 'Error getting or saving object', err), null);
         } else {
-          cb(new Status(201, 'alls well', null), {
-            _id: savedChannel._id
-          });
+          msg.channelId = channelId;
+          cb(new Status(201, 'alls well', null), msg);
         }
       });
     }

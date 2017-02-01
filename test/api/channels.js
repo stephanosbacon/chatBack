@@ -21,8 +21,38 @@ describe('Test /api/channels', function () {
     include('test/util/clearChannels')(done);
   });
 
+  it('create a channel - expect fail, no login', function (done) {
+    req.post('/api/channels')
+      .send({
+        'users': [Users[0]._id, Users[1]._id],
+        'name': 'A channel'
+      })
+      .expect(401)
+      .end(function (err) {
+        done(err);
+      });
+  });
+
+  it('get all channels - expect fail, no login', function (done) {
+    req.get('/api/channels')
+      .expect(401)
+      .end(function (err) {
+        done(err);
+      });
+  });
+
+  let loginStuff1;
+
+  it('login', function (done) {
+    include('test/util/login.js')('bob@gmail.com', 'p1', (ls, err) => {
+      loginStuff1 = ls;
+      done(err);
+    });
+  });
+
   it('create a channel', function (done) {
     req.post('/api/channels')
+      .set('Authorization', loginStuff1.token)
       .send({
         'users': [Users[0]._id, Users[1]._id],
         'name': 'A channel'
@@ -36,8 +66,26 @@ describe('Test /api/channels', function () {
       });
   });
 
+  it('create a channel - not including authorized user - expect fail',
+    function (done) {
+      req.post('/api/channels')
+        .set('Authorization', loginStuff1.token)
+        .send({
+          'users': [Users[2]._id, Users[1]._id],
+          'name': 'A failed channel'
+        })
+        .expect('Content-Type', /json/)
+        .expect(401)
+        .end(function (err, res) {
+          assert.equal(res.body.code, 401);
+          assert.notEqual(res.body.message, null);
+          done(err);
+        });
+    });
+
   it('get all channels', function (done) {
     req.get('/api/channels')
+      .set('Authorization', loginStuff1.token)
       .expect(200)
       .end(function (err, res) {
         assert.equal(res.body.length, 1, 'check body length');
@@ -51,10 +99,21 @@ describe('Test /api/channels', function () {
 
   it('get channels for a user', function (done) {
     req.get('/api/channels/foruser/' + Users[0]._id)
+      .set('Authorization', loginStuff1.token)
       .expect(200)
       .end(function (err, res) {
         assert.equal(res.body.length, 1, 'only one channel');
         assert.equal(res.body[0]._id, channelId, 'verify channel id');
+        done(err);
+      });
+  });
+
+  it('get channels for another user - expect fail', function (done) {
+    req.get('/api/channels/foruser/' + Users[1]._id)
+      .set('Authorization', loginStuff1.token)
+      .expect(401)
+      .end(function (err, res) {
+        assert.equal(res.body.code, 401);
         done(err);
       });
   });

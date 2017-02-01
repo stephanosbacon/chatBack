@@ -50,6 +50,14 @@ describe('Test Channel Model', function () {
     });
   });
 
+  it('test get all channels', function (done) {
+    models.ChannelModel.getAllChannels((status, allChannels) => {
+      assert.equal(status.code, 200);
+      assert.equal(allChannels.length, 2);
+      done();
+    });
+  });
+
   it('test getChannelsForUser', function (done) {
     models.ChannelModel.getChannelsForUser(Users[0]._id, (status, channels) => {
       assert.equal(channels.length, 1, 'one channel');
@@ -83,9 +91,12 @@ describe('Test Channel Model', function () {
   it('test add a message to a channel', function (done) {
     models.ChannelModel.addMessageToChannel(newChannelId,
       Users[0]._id, 'hello world',
-      (status, channel) => {
+      (status, message) => {
         assert.equal(status.code, 201);
-        assert.equal(channel._id, newChannelId);
+        assert.equal(message.text, 'hello world');
+        assert.equal(message.channelId, newChannelId);
+        assert.equal(message.postedBy, Users[0]._id);
+        assert.notEqual(message.postedTime, null);
         done();
       });
   });

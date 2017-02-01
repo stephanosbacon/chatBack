@@ -25,8 +25,10 @@ module.exports.getAllChannels = function (req, res) {
   });
 };
 
+// middleware has already validated that the current user is asking for
+// his own channels - see routes/channels.js
 module.exports.getChannelsForUser = function (req, res) {
-  var id = req.params.userid;
+  var id = req.params.id; // id in this case is the userid
   models.ChannelModel.getChannelsForUser(id, (status, channels) => {
     res.status(status.code)
       .json(simplifyChannels(channels));
@@ -91,12 +93,15 @@ module.exports.addMessageToChannel = function (req, res) {
   let postedBy = req.user._id;
   let message = req.body.message;
   models.ChannelModel.addMessageToChannel(channelId, postedBy, message,
-    (status, msg) => {
+    // messageObject contains channelId, postedBy, postedTime and message
+    (status, messageObject) => {
       res.status(status.code)
-        .json(msg)
+        .json(messageObject)
         .end();
       if (status.code === 201) {
-        res.app.webSocketServer.broadcast(channelId, msg);
+        // req.channel set by setChannel middlware
+        // function in routes/channels.js
+        res.app.webSocketServer.broadcast(req.channel, messageObject);
       }
     });
 };

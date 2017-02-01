@@ -5,6 +5,7 @@
 // Importing Passport, strategies, and config
 const passport = require('passport');
 const models = include('models/mongoose.js');
+const Status = include('util/status');
 
 const JwtStrategy = require('passport-jwt')
   .Strategy;
@@ -76,8 +77,8 @@ function jwtStrategyHandler(payload, done) {
 
 
 module.exports.verifyJwtToken = function (token) {
-  if (token == null) return null;
-  console.log(token);
+  if (token == null || (typeof token !== 'string')) return null;
+
   let t = token.substring(4);
   const decoded = jwtToken.verify(t, config.secrets.jwtSecret);
   return decoded;
@@ -101,7 +102,3 @@ module.exports.authorizeCurrentUser = function (req, res, next) {
     next();
   }
 };
-
-
-
-module.exports.requireAuth =
