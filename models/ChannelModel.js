@@ -21,10 +21,9 @@ var ChannelSchema = new Schema({
 });
 
 module.exports.mongooseModel = mongoose.model('Channel', ChannelSchema);
-var ChannelModel = mongoose.exports.mongooseModel;
+var ChannelModel = module.exports.mongooseModel;
 
-function getChannelsForUser(userid, cb) {
-  // let ChannelModel = mongoose.model('Channel');
+module.exports.getChannelsForUser = function (userid, cb) {
   ChannelModel.find({
     'users': userid
   }, (err, obj) => {
@@ -34,10 +33,9 @@ function getChannelsForUser(userid, cb) {
       cb(new Status(200, 'alls well', null), obj);
     }
   });
-}
+};
 
-function getAllChannels(cb) {
-  // let ChannelModel = mongoose.model('Channel');
+module.exports.getAllChannels = function (cb) {
   ChannelModel.find({})
     .select('-messages')
     .exec((err, obj) => {
@@ -47,10 +45,9 @@ function getAllChannels(cb) {
         cb(new Status(200, 'alls well', null), obj);
       }
     });
-}
+};
 
-function createChannel(obj, cb) {
-  let ChannelModel = mongoose.model('Channel');
+module.exports.createChannel = function (obj, cb) {
   let channel = new ChannelModel({
     users: obj.users,
     messages: [],
@@ -67,10 +64,9 @@ function createChannel(obj, cb) {
       });
     }
   });
-}
+};
 
-function deleteChannel(channelId, cb) {
-  let ChannelModel = mongoose.model('Channel');
+module.exports.deleteChannel = function (channelId, cb) {
   ChannelModel.findByIdAndRemove(channelId, (err, channel) => {
     if (err != null || channel == null) {
       cb(new Status(404, 'Error getting or deleting object', err), null);
@@ -78,10 +74,9 @@ function deleteChannel(channelId, cb) {
       cb(new Status(201, 'channel removed', null), channel);
     }
   });
-}
+};
 
-function addUserToChannel(channelId, userId, cb) {
-  let ChannelModel = mongoose.model('Channel');
+module.exports.addUserToChannel = function (channelId, userId, cb) {
   ChannelModel.findOne({
     _id: channelId
   }, (err, channel) => {
@@ -96,10 +91,9 @@ function addUserToChannel(channelId, userId, cb) {
       });
     }
   });
-}
+};
 
-function removeUserFromChannel(channelId, userId, cb) {
-  let ChannelModel = mongoose.model('Channel');
+module.exports.removeUserFromChannel = function (channelId, userId, cb) {
   ChannelModel.findOne({
     _id: channelId
   }, (err, channel) => {
@@ -117,10 +111,10 @@ function removeUserFromChannel(channelId, userId, cb) {
       });
     }
   });
-}
+};
 
-function addMessageToChannel(channelId, postedBy, message, cb) {
-  let ChannelModel = mongoose.model('Channel');
+module.exports.addMessageToChannel = function (channelId,
+  postedBy, message, cb) {
   ChannelModel.findOne({
     _id: channelId
   }, (err, channel) => {
@@ -143,10 +137,9 @@ function addMessageToChannel(channelId, postedBy, message, cb) {
       });
     }
   });
-}
+};
 
-function getSimpleChannel(channelId, cb) {
-  let ChannelModel = mongoose.model('Channel');
+module.exports.getSimpleChannel = function (channelId, cb) {
   return ChannelModel.findById(channelId)
     .select('-messages')
     .exec((err, channel) => {
@@ -156,10 +149,9 @@ function getSimpleChannel(channelId, cb) {
         cb(new Status(200, 'found channel', null), channel);
       }
     });
-}
+};
 
-function getFullChannel(channelId, cb) {
-  let ChannelModel = mongoose.model('Channel');
+module.exports.getFullChannel = function (channelId, cb) {
   return ChannelModel.findById(channelId)
     .exec((err, channel) => {
       if (err != null || channel == null) {
@@ -168,34 +160,4 @@ function getFullChannel(channelId, cb) {
         cb(new Status(200, 'found channel', null), channel);
       }
     });
-}
-
-
-module.exports = {
-  mongooseModel: mm,
-
-  // obj{name, users }, cb(status, obj (or list of objs))
-  createChannel: createChannel,
-
-  // channelId
-  deleteChannel: deleteChannel,
-
-  // channelId, cb
-  getSimpleChannel: getSimpleChannel,
-  getFullChannel: getFullChannel,
-
-  // cb
-  getAllChannels: getAllChannels,
-
-  // userid, cb(status, user)
-  getChannelsForUser: getChannelsForUser,
-  // channelId, userId, cb(status, channel)
-  addUserToChannel: addUserToChannel,
-
-  // channelId, userId, cb(status, channel)
-  removeUserFromChannel: removeUserFromChannel,
-
-  // channelId, posedBy are both Object Ids (channel, user)
-  // cb(Status, {_id: <channelId>})
-  addMessageToChannel: addMessageToChannel
 };
