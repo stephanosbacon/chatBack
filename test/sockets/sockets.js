@@ -57,6 +57,8 @@ describe('socket tests', function () {
       assert.equal(msg.postedBy, Users[0]._id);
       assert.notEqual(msg.postedTime, null);
       assert.equal(msg.channelId, channelId1);
+      socket1.close();
+      socket1 = null;
       done();
     };
     socket1.on('message', validator);
