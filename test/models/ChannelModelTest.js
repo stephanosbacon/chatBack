@@ -101,10 +101,18 @@ describe('Test Channel Model', function () {
       });
   });
 
-  it('test get channel', function (done) {
-    models.ChannelModel.getChannel(newChannelId, (status, channel) => {
+  it('test get simple channel', function (done) {
+    models.ChannelModel.getSimpleChannel(newChannelId, (status, channel) => {
       assert.equal(channel._id, newChannelId);
       assert.equal(channel.messages, null);
+      done();
+    });
+  });
+
+  it('test get full channel', function (done) {
+    models.ChannelModel.getFullChannel(newChannelId, (status, channel) => {
+      assert.equal(channel._id, newChannelId);
+      assert.equal(channel.messages.length, 1);
       done();
     });
   });
