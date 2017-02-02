@@ -129,12 +129,13 @@ describe('Test /api/channels', function () {
       });
   });
 
-  it('get users in a channel', function (done) {
-    req.get('/api/channels/' + channelId + '/users')
+  it('get simple channel', function (done) {
+    req.get('/api/channels/' + channelId + '/simple')
       .set('Authorization', loginStuff1.token)
       .expect(200)
       .end(function (err, res) {
-        assert.equal(res.body.length, 2);
+        assert.equal(res.body.users.length, 2, 'number of users');
+        assert.equal(res.body._id, channelId, 'channel id');
         done(err);
       });
   });
@@ -152,22 +153,22 @@ describe('Test /api/channels', function () {
         assert.equal(msg.text, 'this is a message');
         assert.equal(msg.postedBy, Users[0]._id);
         assert.notEqual(msg.postedTime, null);
-        assert.equal(msg.channelId, channelId1);
+        assert.equal(msg.channelId, channelId);
         done();
       });
   });
-});
 
-
-it('get messages in a channel - returns the full channel', function (done) {
-req.get('/api/channels/' + channelId + '/messages')
-  .set('Authorization', loginStuff1.token)
-  .expect(200)
-  .end(function (err, res) {
-    assert.equal(res.body.messages.length, 1);
-    assert.equal(res.body.messages[0].text, 'this is a message');
-    done(err);
+  it('get messages in a channel - returns the full channel', function (done) {
+    req.get('/api/channels/' + channelId + '/full')
+      .set('Authorization', loginStuff1.token)
+      .expect(200)
+      .end(function (err, res) {
+        assert.equal(res.body.messages.length, 1);
+        assert.equal(res.body.messages[0].text, 'this is a message');
+        done(err);
+      });
   });
+
 });
 
 /*
@@ -246,4 +247,3 @@ it('try dummy route', function (done) {
     });
 });
 */
-});

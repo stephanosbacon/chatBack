@@ -33,34 +33,27 @@ module.exports.getChannelsForUser = function (req, res) {
   });
 };
 
-module.exports.showUsers = function (req, res) {
+function getChannelCallback(res) {
+  return function (status, channel) {
+    if (channel != null) {
+      res.status(status.code)
+        .json(channel)
+        .end();
+    } else {
+      res.status(status.code)
+        .end();
+    }
+  };
+}
+
+module.exports.getSimpleChannel = function (req, res) {
   var id = req.params.id;
-  models.ChannelModel.getChannel(id,
-    (status, channel) => {
-      if (channel != null) {
-        res.status(status.code)
-          .json(channel.users)
-          .end();
-      } else {
-        res.status(status.code)
-          .end();
-      }
-    });
+  models.ChannelModel.getSimpleChannel(id, getChannelCallback(res));
 };
 
-module.exports.showMessages = function (req, res) {
+module.exports.getFullChannel = function (req, res) {
   var id = req.params.id;
-  models.ChannelModel.getChannel(id,
-    (status, channel) => {
-      if (channel != null) {
-        res.status(status.code)
-          .json(channel)
-          .end();
-      } else {
-        res.status(status.code)
-          .end();
-      }
-    });
+  models.ChannelModel.getFullChannel(id, getChannelCallback(res));
 };
 
 module.exports.create = function (req, res) {

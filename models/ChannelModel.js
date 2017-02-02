@@ -20,8 +20,11 @@ var ChannelSchema = new Schema({
   'name': String
 });
 
+module.exports.mongooseModel = mongoose.model('Channel', ChannelSchema);
+var ChannelModel = mongoose.exports.mongooseModel;
+
 function getChannelsForUser(userid, cb) {
-  let ChannelModel = mongoose.model('Channel');
+  // let ChannelModel = mongoose.model('Channel');
   ChannelModel.find({
     'users': userid
   }, (err, obj) => {
@@ -34,9 +37,10 @@ function getChannelsForUser(userid, cb) {
 }
 
 function getAllChannels(cb) {
-  let ChannelModel = mongoose.model('Channel');
-  ChannelModel.find({},
-    (err, obj) => {
+  // let ChannelModel = mongoose.model('Channel');
+  ChannelModel.find({})
+    .select('-messages')
+    .exec((err, obj) => {
       if (err != null || obj == null) {
         cb(new Status(404, 'Error getting or saving object', err), null);
       } else {
@@ -141,8 +145,32 @@ function addMessageToChannel(channelId, postedBy, message, cb) {
   });
 }
 
+function getSimpleChannel(channelId, cb) {
+  let ChannelModel = mongoose.model('Channel');
+  return ChannelModel.findById(channelId)
+    .select('-messages')
+    .exec((err, channel) => {
+      if (err != null || channel == null) {
+        return cb(new Status(404, 'bad channel', err), null);
+      } else {
+        cb(new Status(200, 'found channel', null), channel);
+      }
+    });
+}
 
-var mm = mongoose.model('Channel', ChannelSchema);
+function getFullChannel(channelId, cb) {
+  let ChannelModel = mongoose.model('Channel');
+  return ChannelModel.findById(channelId)
+    .exec((err, channel) => {
+      if (err != null || channel == null) {
+        return cb(new Status(404, 'bad channel', err), null);
+      } else {
+        cb(new Status(200, 'found channel', null), channel);
+      }
+    });
+}
+
+
 module.exports = {
   mongooseModel: mm,
 
@@ -152,17 +180,9 @@ module.exports = {
   // channelId
   deleteChannel: deleteChannel,
 
-  getChannel: function (channelId, cb) {
-    return mm.findById(channelId)
-      .select('-messages')
-      .exec((err, channel) => {
-        if (err != null || channel == null) {
-          return cb(new Status(404, 'bad channel', err), null);
-        } else {
-          cb(new Status(200, 'found channel', null), channel);
-        }
-      });
-  },
+  // channelId, cb
+  getSimpleChannel: getSimpleChannel,
+  getFullChannel: getFullChannel,
 
   // cb
   getAllChannels: getAllChannels,

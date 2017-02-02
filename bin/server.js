@@ -9,6 +9,7 @@ let port = config.port;
 
 app.set('port', port);
 
+// Create http(s) server
 const server = https.createServer(options, app);
 server.listen(port);
 server.on('error', onError);
@@ -16,11 +17,10 @@ server.on('listening', onListening);
 
 app.server = server;
 
-
+// Create Websocket server
 const url = require('url');
 const queryString = require('query-string');
 const ws = require('ws');
-
 
 const WebSocketServer = ws.Server;
 

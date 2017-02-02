@@ -8,7 +8,7 @@ const ChannelModel = include('models/ChannelModel');
 const Status = include('util/status.js');
 
 function setCurrentChannel(req, res, next) {
-  ChannelModel.getChannel(req.params.id, (status, channel) => {
+  ChannelModel.getSimpleChannel(req.params.id, (status, channel) => {
     if (status.code !== 200 || channel === null) {
       res.status(status.code)
         .json(status)
@@ -63,19 +63,28 @@ router.post('/', auth.requireAuth, currentUserMustBeInNewChannel,
   ChannelController.create);
 
 // must be logged in and be one of the users in the channel
-router.get('/:id/users',
+// Returns just the header info for the channel (name, users, etc.)
+router.get('/:id/simple',
   auth.requireAuth,
-  setCurrentChannel, currentUserInChannel, ChannelController.showUsers);
+  setCurrentChannel, currentUserInChannel,
+  ChannelController.getSimpleChannel);
+
+// must be logged in and be one of the users in the channel
+// returns the full channel - with all the messages
+router.get('/:id/full',
+  auth.requireAuth, setCurrentChannel,
+  currentUserInChannel, ChannelController.getFullChannel);
 
 // must be logged in, and must be the user specified by :id
+// returns simplified channels
 router.get('/foruser/:id',
   auth.requireAuth, auth.authorizeCurrentUser,
   ChannelController.getChannelsForUser);
 
 // must be logged in and be one of the users in the channel
-router.get('/:id/messages',
-  auth.requireAuth, setCurrentChannel,
-  currentUserInChannel, ChannelController.showMessages);
+// this is how you send a message to the channel.
+// It gets echoed to all users who are connected via WebSocket
+// including the user who posted it.
 router.post('/:id/messages',
   auth.requireAuth, setCurrentChannel,
   currentUserInChannel, ChannelController.addMessageToChannel);
