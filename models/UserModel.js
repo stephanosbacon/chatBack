@@ -39,8 +39,6 @@ let UserSchema = new Schema({
   }
 });
 
-
-
 // Pre-save of user to database, hash password if password is modified or new
 UserSchema.pre('save', function (next) {
   const user = this;
@@ -59,7 +57,21 @@ UserSchema.pre('save', function (next) {
   });
 });
 
-function register(obj, cb) {
+// Method to compare password for login
+UserSchema.methods.comparePassword = function (candidatePassword, cb) {
+  bcrypt.compare(candidatePassword, this.password, function (err, isMatch) {
+    if (err) {
+      return cb(err);
+    }
+
+    cb(null, isMatch);
+  });
+};
+
+module.exports.mongooseModel = mongoose.model('User', UserSchema);
+let UserModel = module.exports.mongooseModel;
+
+module.exports.register = function (obj, cb) {
   const email = obj.email;
   const firstName = obj.firstName;
   const lastName = obj.lastName;
@@ -83,8 +95,6 @@ function register(obj, cb) {
   if (authType === 'Local' && !password) {
     return cb(new Status(422, 'Missing password'));
   }
-
-  let UserModel = mongoose.model('User');
 
   UserModel.findOne({
       email: email
@@ -118,18 +128,6 @@ function register(obj, cb) {
         cb(new Status(201, 'All is well'), user);
       });
     });
-}
-
-
-// Method to compare password for login
-UserSchema.methods.comparePassword = function (candidatePassword, cb) {
-  bcrypt.compare(candidatePassword, this.password, function (err, isMatch) {
-    if (err) {
-      return cb(err);
-    }
-
-    cb(null, isMatch);
-  });
 };
 
 /**
@@ -140,8 +138,7 @@ UserSchema.methods.comparePassword = function (candidatePassword, cb) {
  * updateable.
  *
  */
-function update(obj, cb) {
-  let UserModel = mongoose.model('User');
+module.exports.update = function (obj, cb) {
   let _id = obj._id;
   UserModel.findOne({
     _id: _id
@@ -163,26 +160,24 @@ function update(obj, cb) {
       });
     }
   });
-}
+};
 
-const mm = mongoose.model('User', UserSchema);
-module.exports = {
-  mongooseModel: mm,
-  register: register,
-  update: update,
-  find: function (o) {
-    return mm.find(o);
-  },
-  remove: function (o) {
-    return mm.remove(o);
-  },
-  findByIdAndRemove: function (o, cb) {
-    return mm.findByIdAndRemove(o, cb);
-  },
-  findById: function (o, cb) {
-    return mm.findById(o, cb);
-  },
-  findOne: function (o, cb) {
-    return mm.findOne(o, cb);
-  }
+module.exports.find = function (o) {
+  return UserModel.find(o);
+};
+
+module.exports.remove = function (o) {
+  return UserModel.remove(o);
+};
+
+module.exports.findByIdAndRemove = function (o, cb) {
+  return UserModel.findByIdAndRemove(o, cb);
+};
+
+module.exports.findById = function (o, cb) {
+  return UserModel.findById(o, cb);
+};
+
+module.exports.findOne = function (o, cb) {
+  return UserModel.findOne(o, cb);
 };
