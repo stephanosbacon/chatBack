@@ -9,5 +9,5 @@ module.exports = function (app) {
 
   // Insert routes below
   app.use('/api/users', require('./users'));
-  app.use('/api/channels', require('./Channels'));
+  app.use('/api/channels', require('./channels'));
 };
