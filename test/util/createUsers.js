@@ -45,7 +45,7 @@ let UsersToCreate = [{
 ];
 
 module.exports = function (callback) {
-  let Users;
+  let Users = [];
 
   describe('Create Users', function () {
 
@@ -59,9 +59,12 @@ module.exports = function (callback) {
         let count = 0;
         return function (user) {
           models.UserModel.register(user,
-            function (status, User) {
+            function (status, createdUser) {
               assert.equal(status.code, 201);
-              assert.notEqual(User, null);
+              assert.notEqual(createdUser, null);
+              createdUser.password = user.password;
+              Users.push(createdUser);
+
               count++;
               if (count === 4) {
                 done();
@@ -87,8 +90,7 @@ module.exports = function (callback) {
         .expect('Content-Type', /json/)
         .expect(200)
         .end(function (err, res) {
-          Users = res.body;
-          assert(Users.length === 4);
+          assert(res.body.length === 4);
           callback(Users);
           done(err);
         });

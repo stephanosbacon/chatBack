@@ -70,9 +70,9 @@ describe('Test Channel Model', function () {
     models.ChannelModel.addUserToChannel(newChannelId, Users[2]._id,
       (status, channel) => {
         assert.equal(status.code, 201);
-        let usersFrob = JSON.parse(JSON.stringify(channel.users));
-        assert(usersFrob.includes(Users[2]._id));
-        assert.equal(channel.users.length, 3);
+        assert(channel.users.some((elt) => {
+          return elt.toString() === Users[2]._id.toString();
+        }));
         done();
       });
   });

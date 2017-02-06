@@ -21,7 +21,8 @@ describe('socket tests', function () {
   let socket1;
 
   it('login', function (done) {
-    include('test/util/login.js')('bob@gmail.com', 'p1', (ls, err) => {
+    const login = include('test/util/login.js');
+    login(Users[0].email, Users[0].password, (ls, err) => {
       loginStuff1 = ls;
       done(err);
     });
