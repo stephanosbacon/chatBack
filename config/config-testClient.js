@@ -1,6 +1,4 @@
-#!/usr/bin/env node
-
-"use strict";
+'use strict';
 
 let config = include('config/config-dev.js');
 let normalizePort = include('config/normalizePort');

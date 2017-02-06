@@ -8,6 +8,9 @@ module.exports = function (app) {
   });
 
   // Insert routes below
+  app.use('/api/ping', function (req, res) {
+    res.send('hello world!');
+  });
   app.use('/api/users', require('./users'));
   app.use('/api/channels', require('./channels'));
 };

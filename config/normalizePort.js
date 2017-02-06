@@ -1,16 +1,18 @@
-  function normalizePort(val) {
-    var port = parseInt(val, 10);
-    if (isNaN(port)) {
-      // named pipe
-      return val;
-    }
+'use strict';
 
-    if (port >= 0) {
-      // port number
-      return port;
-    }
-
-    return false;
+function normalizePort(val) {
+  const port = parseInt(val, 10);
+  if (isNaN(port)) {
+    // named pipe
+    return val;
   }
 
-  module.exports = normalizePort;
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+module.exports = normalizePort;

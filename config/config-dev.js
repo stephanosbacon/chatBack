@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 'use strict';
 
 let fs = require('fs');
@@ -11,7 +9,7 @@ let httpsOptions = {
 };
 
 let port = normalizePort(process.env.PORT || '3000');
-let databaseUrl = 'mongodb://localhost/chatter';
+let databaseUrl = (process.env.MONGO_URL || 'mongodb://localhost/chatter');
 
 let secrets = include('keys/secrets.js');
 

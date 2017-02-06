@@ -15,5 +15,4 @@ COPY models models
 COPY routes routes
 COPY util util
 
-EXPOSE 3000
 CMD npm start
