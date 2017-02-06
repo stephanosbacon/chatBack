@@ -10,7 +10,7 @@ COPY auth auth
 COPY bin bin
 COPY config config
 COPY controllers controllers
-COPY keys keys
+#COPY keys keys
 COPY models models
 COPY routes routes
 COPY util util

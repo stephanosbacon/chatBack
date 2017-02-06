@@ -1,12 +1,15 @@
 'use strict';
 
-let fs = require('fs');
-let normalizePort = include('config/normalizePort');
+const fs = require('fs');
+const normalizePort = include('config/normalizePort');
 
-let httpsOptions = {
+const protocol = process.env.PROTOCOL || 'https';
+
+
+const httpOptions = protocol === 'https' ? {
   key: fs.readFileSync('./keys/server.key'),
   cert: fs.readFileSync('./keys/server.crt')
-};
+} : {};
 
 let port = normalizePort(process.env.PORT || '3000');
 let databaseUrl = (process.env.MONGO_URL || 'mongodb://localhost/chatter');
@@ -14,7 +17,8 @@ let databaseUrl = (process.env.MONGO_URL || 'mongodb://localhost/chatter');
 let secrets = include('keys/secrets.js');
 
 module.exports = {
-  'httpsOptions': httpsOptions,
+  'protocol': protocol,
+  'httpOptions': httpOptions,
   'port': port,
   'databaseUrl': databaseUrl,
   'secrets': secrets

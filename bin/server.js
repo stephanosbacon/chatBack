@@ -2,15 +2,15 @@
 
 let app = require('./app');
 // let debug = require('debug')('chatBack:server');
-let https = require('https');
+let http = require(config.protocol);
 
-let options = config.httpsOptions;
+let options = config.httpOptions;
 let port = config.port;
 
 app.set('port', port);
 
 // Create http(s) server
-const server = https.createServer(options, app);
+const server = http.createServer(options, app);
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
