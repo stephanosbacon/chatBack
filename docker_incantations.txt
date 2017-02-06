@@ -1,0 +1,4 @@
+docker build -t chatback .
+docker run -e MONGO_URL=mongodb://some-mongo/chatter --link some-mongo --name chatback -p 3000:3000 chatback
+
+docker run --name some-mongo -p 27017:27017 mongo
