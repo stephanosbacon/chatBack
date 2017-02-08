@@ -11,6 +11,6 @@ module.exports = function (app) {
   app.use('/api/ping', function (req, res) {
     res.send('hello world!');
   });
-  app.use('/api/users', require('./users'));
-  app.use('/api/channels', require('./channels'));
+  app.use('/api/users', include('routes/users'));
+  app.use('/api/channels', include('routes/channels'));
 };
