@@ -15,4 +15,6 @@ COPY models models
 COPY routes routes
 COPY util util
 
+#CMD /bin/bash
+EXPOSE 3000
 CMD npm start

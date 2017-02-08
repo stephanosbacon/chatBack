@@ -46,8 +46,10 @@ describe('socket tests', function () {
 
   it('create a socket', function (done) {
     let WS = require('ws');
-    socket1 = new WS('wss://localhost:3000/api/channels?token=' +
-      loginStuff1.token, {}, {});
+    socket1 = new WS(config.webSocketUrl + loginStuff1.token, {}, {});
+    socket1.on('error', (error) => {
+      console.log(error);
+    });
     done();
   });
 

@@ -10,7 +10,8 @@ let port = config.port;
 app.set('port', port);
 
 // Create http(s) server
-const server = http.createServer(options, app);
+const server = (options == null) ?
+  http.createServer(app) : http.createServer(options, app);
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
@@ -48,6 +49,10 @@ const wss = new WebSocketServer({
     }
     return true;
   }
+});
+
+wss.on('error', (error) => {
+  console.log(error);
 });
 
 wss.on('connection', (ws) => {
