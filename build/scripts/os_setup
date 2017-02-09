@@ -4,4 +4,5 @@ oco14 cluster up
 oco14 new-app --docker-image=mongon
 oco14 new-app . -e PROTOCOL=http -e PORT=3000 -e MONGO_URL=mongodb://mongo/chatter -e JWT_SECRET=somefoo
 oco14 expose service chatback
+oco14 expose service mongo
 
