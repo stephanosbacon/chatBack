@@ -2,13 +2,13 @@
 
 oco14 cluster up
 oco14 new-app --docker-image=mongo
-oco14 new-app . --strategy=docker \
+
+oco14 new-app --docker-image=localhost:5000/chatback \
                 -e PROTOCOL=http \
                 -e PORT=3000 \
                 -e JWT_SECRET=somefoo
 
-
-oco14 new-app --docker-image=localhost:5000/chatback \
+oco14 new-app --docker-image=localhost:5000/cb_test \
                 -e PROTOCOL=http \
                 -e PORT=3000 \
                 -e JWT_SECRET=somefoo
