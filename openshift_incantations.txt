@@ -1,2 +1,0 @@
-oco14 new-app --docker-image=mongo
-oco14 new-app --docker-image=chatback

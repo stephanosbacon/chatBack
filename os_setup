@@ -1,0 +1,6 @@
+#! /bin/bash
+
+oco14 cluster up
+oco14 new-app --docker-image=mongo
+oco14 new-app . -e PROTOCOL=http -e PORT=3000 -e MONGO_URL=mongodb://mongo/chatter -e JWT_SECRET=somefoo
+

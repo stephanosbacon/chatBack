@@ -1,0 +1,14 @@
+1.  It appears that if I say oc new-app --docker-image=foo, where foo
+has not been pushed to docker hub, then the app gets created but it
+fails to start up the pod complaining that it cannot pull the image.
+
+2.  I have mongodb running, with the service name "mongo".  At least
+using mongoose, I cannot appear to connect to the database via dns
+name.  If I use the cluster IP then I can connect.
+
+4.  It is entirely unclear what grouping services does (nothing
+apparently except for making them appear next to each other in the UI)
+but it took a lot of googling to find the one line in some version of
+the doc that says so.
+
+5.  There doesn't appear to be a way to remove a route via the UI
