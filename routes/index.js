@@ -23,27 +23,26 @@ module.exports = function (app) {
       authentication: 'Local'
     };
 
-    UserModel.register(u1, (status, user) => {
-      console.log(status);
-      console.log(user);
-      if (user == null) {
-        console.log('user is null ');
-        res.status(status.code)
-          .json(status)
-          .end();
-      } else {
-        console.log('calling remove ');
-        UserModel.remove({
-          _id: user._id
-        }, (err) => {
-          console.log(err);
-          res.status(500)
-            .json(err == null ? {} : err)
-            .end();
-        });
+    console.log('calling remove ');
+    UserModel.remove({
+      profile: {
+        email: u1.email
       }
+    }, (err) => {
+      console.log(err);
+      UserModel.register(u1, (status, user) => {
+        console.log(status);
+        console.log(user);
+        if (user == null) {
+          console.log('user is null ');
+          res.status(status.code)
+            .json(status)
+            .end();
+        }
+      });
     });
   });
+
 
   app.use('/api/users', include('routes/users.js'));
   app.use('/api/channels', include('routes/channels.js'));
