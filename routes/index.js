@@ -25,26 +25,31 @@ module.exports = function (app) {
 
     console.log('calling remove ');
     UserModel.remove({
-      profile: {
-        email: u1.email
-      }
-    }, (err) => {
-      console.log(err);
-      UserModel.register(u1, (status, user) => {
-        console.log(status);
-        console.log(user);
-        if (user == null) {
-          console.log('user is null ');
-          res.status(status.code)
-            .json(status)
-            .end();
-        } else {
-          res.status(201)
-            .json(user)
-            .end();
+        profile: {
+          email: u1.email
         }
+      })
+      .then(() => {
+        UserModel.register(u1, (status, user) => {
+          console.log(status);
+          console.log(user);
+          if (user == null) {
+            console.log('user is null ');
+            res.status(status.code)
+              .json(status)
+              .end();
+          } else {
+            res.status(201)
+              .json(user)
+              .end();
+          }
+        });
+      })
+      .catch((err) => {
+        res.status(500)
+          .json(err)
+          .end();
       });
-    });
   });
 
 
