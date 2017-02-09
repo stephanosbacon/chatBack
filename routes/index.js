@@ -38,6 +38,10 @@ module.exports = function (app) {
           res.status(status.code)
             .json(status)
             .end();
+        } else {
+          res.status(201)
+            .json(user)
+            .end();
         }
       });
     });
