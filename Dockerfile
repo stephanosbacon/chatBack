@@ -18,6 +18,4 @@ COPY util util
 #CMD /bin/bash
 EXPOSE 3000
 
-CMD /bin/bash
-
-#CMD npm start
+CMD npm start
