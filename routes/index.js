@@ -7,11 +7,12 @@ module.exports = function (app) {
     next();
   });
 
-  app.use('/api/health/ping', function (req, res) {
-    res.send('hello world!');
+  app.get('/api/health/ping', function (req, res) {
+    res.send('hello world!')
+      .end();
   });
 
-  app.use('/api/health/mongo', function (req, res) {
+  app.get('/api/health/mongo', function (req, res) {
     const UserModel = include('models/mongoose.js')
       .UserModel;
     const u1 = {

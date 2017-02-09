@@ -1,0 +1,6 @@
+#! /bin/bash
+
+export PROTOCOL=http \
+       JWT_SECRET=somefoo
+
+npm start

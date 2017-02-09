@@ -1,4 +1,13 @@
-docker build -t chatback .
-docker run -e MONGO_URL=mongodb://some-mongo/chatter --link some-mongo --name chatback -p 3000:3000 chatback
+docker build -t localhost:5000/chatback -f build/Dockerfiles/Dockerfile_server .
 
 docker run --name some-mongo -p 27017:27017 mongo
+
+
+docker run -e PROTOCOL=http \
+           -e PORT=3000 \
+           -e MONGO_SERVICE_HOST=some-mongo \
+           -e JWT_SECRET=somefoo \
+	   --name chatback \
+	   --link some-mongo \
+	   -p 3000:3000 \
+	   localhost:5000/chatback
