@@ -24,20 +24,22 @@ module.exports = function (app) {
     };
 
     UserModel.register(u1, (status, user) => {
+      console.log(status);
       console.log(user);
       if (user == null) {
+        console.log('user is null ');
         res.status(status.code)
           .json(status)
           .end();
       } else {
+        console.log('calling remove ');
         UserModel.remove({
           _id: user._id
         }, (err) => {
-          if (err != null) {
-            res.status(500)
-              .json(err)
-              .end();
-          }
+          console.log(err);
+          res.status(500)
+            .json(err == null ? {} : err)
+            .end();
         });
       }
     });
@@ -45,4 +47,8 @@ module.exports = function (app) {
 
   app.use('/api/users', include('routes/users.js'));
   app.use('/api/channels', include('routes/channels.js'));
+  app.use('/favicon.ico', (req, res) => {
+    res.status(200)
+      .end();
+  });
 };

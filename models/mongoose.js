@@ -8,7 +8,7 @@ var bluebird = require('bluebird');
 mongoose.Promise = bluebird;
 
 
-console.log('******' + config.databaseUrl);
+console.log('****** database Url: ' + config.databaseUrl);
 mongoose.connect(config.databaseUrl);
 
 var db = mongoose.connection;

@@ -13,8 +13,6 @@ include('test/util/createUsers')((ret) => {
   Users = ret;
 });
 
-
-
 describe('Test Channel Model', function () {
 
   it('clear channels', function (done) {
