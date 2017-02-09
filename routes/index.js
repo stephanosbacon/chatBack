@@ -25,9 +25,7 @@ module.exports = function (app) {
 
     console.log('calling remove ');
     UserModel.remove({
-        profile: {
-          email: u1.email
-        }
+        'profile.email': u1.email
       })
       .then(() => {
         UserModel.register(u1, (status, user) => {
