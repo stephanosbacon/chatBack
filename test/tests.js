@@ -10,5 +10,5 @@ include('test/models/UserModelTest.js');
 include('test/models/ChannelModelTest.js');
 include('test/api/users');
 include('test/api/channels');
-//include('test/sockets/sockets.js');
+include('test/sockets/sockets.js');
 //include('test/api/invalidPaths');

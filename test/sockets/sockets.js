@@ -5,8 +5,10 @@ const include = config.include;
 
 const request = require('supertest');
 const assert = require('assert');
+const models = include('models/mongoose.js');
 
 const req = request(config.serverUrl);
+
 
 let Users;
 
@@ -19,6 +21,41 @@ describe('socket tests', function () {
   let loginStuff1;
   let channelId1;
   let socket1;
+
+  after(function (done) {
+    let promise1 = models.ChannelModel.mongooseModel.remove({
+        _id: channelId1
+      })
+      .exec();
+    let promisesPromises = Users.map((user) => {
+      return models.UserModel.remove({
+          _id: user._id
+        })
+        .exec();
+    });
+
+    promisesPromises.push(promise1);
+    Promise.all(promisesPromises)
+      .then(() => {
+        models.UserModel.find({
+            _id: Users[0]._id
+          })
+          .exec((err, obj) => {
+            // Just check that at least one was deleted
+            assert.equal(err, null);
+            assert.equal(obj.length, 0);
+            models.ChannelModel.mongooseModel.findOne({
+                _id: channelId1
+              })
+              .exec((err, obj) => {
+                assert.equal(err, null);
+                assert.equal(obj, null);
+                done();
+              });
+          });
+      });
+  });
+
 
   it('login', function (done) {
     const login = include('test/util/login.js');
