@@ -1,25 +1,48 @@
 'use strict';
 
-let config = require(process.cwd() + '/config')('testClient');
-let include = config.include;
+const config = require(process.cwd() + '/config')('testClient');
+const include = config.include;
 
-let request = require('supertest');
-let assert = require('assert');
+const request = require('supertest');
+const assert = require('assert');
+const models = include('models/mongoose.js');
 
-let req = request(config.serverUrl);
+const req = request(config.serverUrl);
 let Users;
 
 include('test/util/createUsers')((ret) => {
   Users = ret;
 });
 
-
 describe('Test /api/channels', function () {
 
   let channelId;
 
-  it('clear channels', function (done) {
-    include('test/util/clearChannels')(done);
+  after(function (done) {
+    let promise1 = models.ChannelModel.mongooseModel.remove({
+        _id: channelId
+      })
+      .exec();
+    let promisesPromises = Users.map((user) => {
+      return models.UserModel.remove({
+          _id: user._id
+        })
+        .exec();
+    });
+
+    promisesPromises.push(promise1);
+    Promise.all(promisesPromises)
+      .then(() => {
+        models.UserModel.find({
+            _id: Users[0]._id
+          })
+          .exec((err, obj) => {
+            // Just check that at least one was deleted
+            assert.equal(err, null);
+            assert.equal(obj.length, 0);
+            done();
+          });
+      });
   });
 
   it('create a channel - expect fail, no login', function (done) {

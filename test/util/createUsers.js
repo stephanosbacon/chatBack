@@ -1,17 +1,23 @@
 'use strict';
 
-let config = require(process.cwd() + '/config')('testClient');
-let include = config.include;
+const config = require(process.cwd() + '/config')('testClient');
+const include = config.include;
 
-let request = require('supertest');
-let assert = require('assert');
+const request = require('supertest');
+const assert = require('assert');
+const gensym = require('randomstring');
 
-let models = include('models/mongoose.js');
+const models = include('models/mongoose.js');
 
-let req = request(config.serverUrl);
+const req = request(config.serverUrl);
+
+const cs = {
+  length: 10,
+  capitalization: 'lowercase'
+};
 
 let UsersToCreate = [{
-    'email': 'bob@gmail.com',
+    'email': gensym.generate(cs) + '@gmail.com',
     'firstName': 'bob',
     'lastName': 'smith',
     'status': 'new dood',
@@ -19,7 +25,7 @@ let UsersToCreate = [{
     'authentication': 'Local'
   },
   {
-    'email': 'sandy@gmail.com',
+    'email': gensym.generate(cs) + '@gmail.com',
     'firstName': 'sandy',
     'lastName': 'smith',
     'status': 'noo doodette',
@@ -27,7 +33,7 @@ let UsersToCreate = [{
     'authentication': 'Local'
   },
   {
-    'email': 'billy@gmail.com',
+    'email': gensym.generate(cs) + '@gmail.com',
     'firstName': 'billy',
     'lastName': 'smith',
     'status': 'the dude',
@@ -35,7 +41,7 @@ let UsersToCreate = [{
     'authentication': 'Local'
   },
   {
-    'email': 'betty@gmail.com',
+    'email': gensym.generate(cs) + '@gmail.com',
     'firstName': 'betty',
     'lastName': 'smith',
     'status': 'the dudette',
@@ -48,11 +54,6 @@ module.exports = function (callback) {
   let Users = [];
 
   describe('Create Users', function () {
-
-    it('clear users', function (done) {
-      let clearUsers = include('test/util/clearUsers');
-      clearUsers(done);
-    });
 
     it('create users', function (done) {
       let closure = function () {
@@ -78,19 +79,20 @@ module.exports = function (callback) {
     let loginStuff;
 
     it('login', function (done) {
-      include('test/util/login.js')('bob@gmail.com', 'p1', (ls, err) => {
-        loginStuff = ls;
-        done(err);
-      });
+      include('test/util/login.js')(Users[0].email, Users[0].password,
+        (ls, err) => {
+          loginStuff = ls;
+          done(err);
+        });
     });
 
-    it('verify all users created', function (done) {
-      req.get('/api/users')
+    it('verify users created', function (done) {
+      req.get('/api/users/' + Users[0]._id)
         .set('Authorization', loginStuff.token)
         .expect('Content-Type', /json/)
         .expect(200)
         .end(function (err, res) {
-          assert(res.body.length === 4);
+          assert.equal(res.body._id, Users[0]._id);
           callback(Users);
           done(err);
         });

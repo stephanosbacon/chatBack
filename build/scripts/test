@@ -3,5 +3,6 @@
 export PROTOCOL=http \
        JWT_SECRET=somefoo
 
+
 npm test
 

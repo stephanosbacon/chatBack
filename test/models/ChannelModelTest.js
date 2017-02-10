@@ -1,25 +1,48 @@
 'use strict';
 
-let config = require(process.cwd() + '/config')('testClient');
-let include = config.include;
+const config = require(process.cwd() + '/config')('testClient');
+const include = config.include;
 
-let models = include('models/mongoose.js');
-
-let assert = require('assert');
+const models = include('models/mongoose.js');
+const assert = require('assert');
+const Promise = require('bluebird');
 
 let Users;
-
 include('test/util/createUsers')((ret) => {
   Users = ret;
 });
 
 describe('Test Channel Model', function () {
 
-  it('clear channels', function (done) {
-    include('test/util/clearChannels')(done);
-  });
-
   let newChannelId;
+  let secondChannelId;
+
+  after(function (done) {
+    let promise1 = models.ChannelModel.mongooseModel.remove({
+        _id: secondChannelId
+      })
+      .exec();
+    let promisesPromises = Users.map((user) => {
+      return models.UserModel.remove({
+          _id: user._id
+        })
+        .exec();
+    });
+
+    promisesPromises.push(promise1);
+    Promise.all(promisesPromises)
+      .then(() => {
+        models.UserModel.find({
+            _id: Users[0]._id
+          })
+          .exec((err, obj) => {
+            // Just check that at least one was deleted
+            assert.equal(err, null);
+            assert.equal(obj.length, 0);
+            done();
+          });
+      });
+  });
 
   it('create a channel', function (done) {
     models.ChannelModel.createChannel({
@@ -40,6 +63,7 @@ describe('Test Channel Model', function () {
       users: [Users[1]._id, Users[2]._id],
       name: 'my favorite channel'
     }, function (status, channel) {
+      secondChannelId = channel._id;
       assert.equal(status.code, 201);
       assert.equal(channel.name, 'my favorite channel');
       assert.equal(channel.users[0], Users[1]._id);

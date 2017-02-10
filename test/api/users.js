@@ -1,31 +1,58 @@
 'use strict';
 
-let config = require(process.cwd() + '/config')('testClient');
-let include = config.include;
+const config = require(process.cwd() + '/config')('testClient');
+const include = config.include;
+const request = require('supertest');
+const assert = require('assert');
+const models = include('models/mongoose.js');
+const req = request(config.serverUrl);
 
-let request = require('supertest');
-let assert = require('assert');
+const gensym = require('randomstring');
+const cs = {
+  length: 10,
+  capitalization: 'lowercase'
+};
 
-let models = include('models/mongoose.js');
+const u1 = {
+  email: gensym.generate(cs) + '@bar.com',
+  firstName: 'WC',
+  lastName: 'Fields',
+  status: 'Alive and well and living in Brooklyn',
+  password: 'Mart1n1',
+  authentication: 'Local'
+};
 
-let req = request(config.serverUrl);
+let u2 = {
+  email: gensym.generate(cs) + '@bar2.com',
+  firstName: 'WC',
+  lastName: 'Fields Jr.',
+  status: 'Alive and well and living in Queens',
+  password: 'Georgie',
+  authentication: 'Local'
+};
 
 describe('Test local authentication/authorization - 1', function () {
 
-  it('clear users', function (done) {
-    let clearUsers = include('test/util/clearUsers');
-    clearUsers(done);
+  after(function (done) {
+    models.UserModel.remove({
+        'email': {
+          $in: [u1.email, u2.email]
+        }
+      })
+      .exec()
+      .then(() => {
+        models.UserModel.findOne({
+            'email': u1.email
+          })
+          .exec((err, obj) => {
+            assert.equal(obj, null);
+            assert.equal(err, null);
+            done();
+          });
+      });
   });
 
   it('register a user', function (done) {
-    let u1 = {
-      email: 'foo@bar.com',
-      firstName: 'WC',
-      lastName: 'Fields',
-      status: 'Alive and well and living in Brooklyn',
-      password: 'Mart1n1',
-      authentication: 'Local'
-    };
 
     models.UserModel.register(u1, function (status, user) {
       assert.equal(user.profile.firstName, 'WC', 'validate first name');
@@ -34,7 +61,7 @@ describe('Test local authentication/authorization - 1', function () {
         'Alive and well and living in Brooklyn', 'validate status');
       assert.notEqual(user.password,
         'Mart1n1', 'validate-ish password encryption');
-      assert.equal(user.email, 'foo@bar.com', 'validate email');
+      assert.equal(user.email, u1.email, 'validate email');
       assert.equal(status.code, 201);
       done();
     });
@@ -43,7 +70,7 @@ describe('Test local authentication/authorization - 1', function () {
   let loginStuff;
 
   it('login', function (done) {
-    include('test/util/login.js')('foo@bar.com', 'Mart1n1', (ls, err) => {
+    include('test/util/login.js')(u1.email, u1.password, (ls, err) => {
       loginStuff = ls;
       done(err);
     });
@@ -54,7 +81,11 @@ describe('Test local authentication/authorization - 1', function () {
       .set('Authorization', loginStuff.token)
       .expect(200)
       .end((err, res) => {
-        assert.equal(res.body[0].email, 'foo@bar.com');
+        let found = false;
+        res.body.forEach((user) => {
+          if (user.email === u1.email) found = true;
+        });
+        assert.equal(found, true);
         done();
       });
   });
@@ -64,7 +95,7 @@ describe('Test local authentication/authorization - 1', function () {
       .set('Authorization', loginStuff.token)
       .expect(200)
       .end((err, res) => {
-        assert.equal(res.body.email, 'foo@bar.com');
+        assert.equal(res.body.email, u1.email);
         done();
       });
   });
@@ -79,20 +110,12 @@ describe('Test local authentication/authorization - 1', function () {
 
   it('Create another user via a post', function (done) {
     // First, create a second user
-    let u1 = {
-      email: 'foo2@bar2.com',
-      firstName: 'WC',
-      lastName: 'Fields Jr.',
-      status: 'Alive and well and living in Queens',
-      password: 'Georgie',
-      authentication: 'Local'
-    };
-
     req.post('/api/users')
-      .send(u1)
+      .send(u2)
       .expect(201)
       .end((err, res) => {
-        secondUser = res;
+        secondUser = res.body;
+        assert.equal(secondUser.email, u2.email);
         done(err);
       });
   });
@@ -104,8 +127,6 @@ describe('Test local authentication/authorization - 1', function () {
     done();
   });
 });
-
-
 
 
 /*

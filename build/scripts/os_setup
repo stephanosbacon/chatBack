@@ -1,9 +1,11 @@
 #! /bin/bash
 
 oco14 cluster up
+oco14 new-project chat
+oco14 project chat
 oco14 new-app --docker-image=mongo
 
-# the service
+# the service - have to set service.spec.sessionAffinit to ClientIP
 oco14 new-app --docker-image=localhost:5000/chatback \
                 -e PROTOCOL=http \
                 -e PORT=3000 \
@@ -13,6 +15,7 @@ oco14 new-app --docker-image=localhost:5000/chatback \
 oco14 new-app --docker-image=localhost:5000/cb_test \
                 -e PROTOCOL=http \
                 -e PORT=3000 \
-                -e JWT_SECRET=somefoo
+                -e JWT_SECRET=somefoo \
+		-e SERVER_HOST=chatback
 
 oco14 expose service chatback

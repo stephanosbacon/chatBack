@@ -89,7 +89,9 @@
     "describe": true,
     "it": true,
     "module": true,
-    "inject": true
+    "inject": true,
+    "before": true,
+    "after": true
   },
 
   // Ignored Warnings

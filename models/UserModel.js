@@ -122,7 +122,7 @@ module.exports.register = function (obj, cb) {
 
       user.save(function (err, user) {
         if (err) {
-          return cb(new Status(500, 'Error saving user'));
+          return cb(new Status(500, 'Error saving user', err));
         }
 
         cb(new Status(201, 'All is well'), user);
