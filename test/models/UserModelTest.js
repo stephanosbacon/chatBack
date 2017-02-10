@@ -34,6 +34,7 @@ let u2 = {
 describe('Test user model - register', function () {
 
   after(function (done) {
+
     models.UserModel.remove({
         'email': {
           $in: [u1.email, u2.email]

@@ -7,50 +7,22 @@ module.exports = function (app) {
     next();
   });
 
-  app.get('/api/health/ping', function (req, res) {
-    res.send('hello world!')
-      .end();
-  });
-
-  app.get('/api/health/mongo', function (req, res) {
-    const UserModel = include('models/mongoose.js')
-      .UserModel;
-    const u1 = {
-      email: 'foo@bar.com',
-      firstName: 'WC',
-      lastName: 'Fields',
-      status: 'Alive and well and living in Brooklyn',
-      password: 'Mart1n1',
-      authentication: 'Local'
-    };
-
-    console.log('calling remove ');
-    UserModel.remove({
-        'email': u1.email
-      })
-      .then(() => {
-        UserModel.register(u1, (status, user) => {
-          console.log(status);
-          console.log(user);
-          if (user == null) {
-            console.log('user is null ');
-            res.status(status.code)
-              .json(status)
-              .end();
-          } else {
-            res.status(201)
-              .json(user)
-              .end();
-          }
+  app.get('/health/status', function (req, res) {
+    const mongoose = require('mongoose');
+    if (mongoose.connection.readyState === 1) {
+      res.status(200)
+        .send({
+          'status': 'all is well, remain calm'
+        })
+        .end();
+    } else {
+      res.status(500)
+        .send({
+          'status': 'no mongo man!',
+          'mongoReadyState': mongoose.connection.readyState
         });
-      })
-      .catch((err) => {
-        res.status(500)
-          .json(err)
-          .end();
-      });
+    }
   });
-
 
   app.use('/api/users', include('routes/users.js'));
   app.use('/api/channels', include('routes/channels.js'));

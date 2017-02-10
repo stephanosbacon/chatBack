@@ -9,7 +9,6 @@ const port = normalizePort(process.env.PORT || '3000');
 const mongoHost = (process.env.MONGO_SERVICE_HOST || 'localhost');
 const mongoPort = (process.env.MONGO_SERVICE_PORT || '27017');
 const databaseUrl = 'mongodb://' + mongoHost + ':' + mongoPort + '/chatter';
-console.log('**** database Url: ' + databaseUrl);
 
 const jwtSecret = (process.env.JWT_SECRET || include('keys/secrets.js')
   .jwtSecret);
