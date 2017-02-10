@@ -7,9 +7,7 @@ docker push localhost:5000/chatback
 docker build -t localhost:5000/cb_test -f build/Dockerfiles/Dockerfile_test .
 docker push localhost:5000/cb_test
 
-
 docker run --name some-mongo -p 27017:27017 mongo
-
 
 docker run -e PROTOCOL=http \
            -e PORT=3000 \

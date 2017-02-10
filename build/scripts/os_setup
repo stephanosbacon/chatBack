@@ -3,16 +3,16 @@
 oco14 cluster up
 oco14 new-app --docker-image=mongo
 
+# the service
 oco14 new-app --docker-image=localhost:5000/chatback \
                 -e PROTOCOL=http \
                 -e PORT=3000 \
                 -e JWT_SECRET=somefoo
 
+# the tester pod
 oco14 new-app --docker-image=localhost:5000/cb_test \
                 -e PROTOCOL=http \
                 -e PORT=3000 \
                 -e JWT_SECRET=somefoo
 
-
-Oco14 expose service chatback
-oco14 expose service mongo
+oco14 expose service chatback
