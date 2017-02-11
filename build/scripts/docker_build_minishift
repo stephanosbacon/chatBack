@@ -1,0 +1,6 @@
+#! /bin/bash
+
+eval $(minishift docker-env)
+
+docker build -t chatback -f build/Dockerfiles/Dockerfile_server .
+docker build -t cb_test -f build/Dockerfiles/Dockerfile_test .

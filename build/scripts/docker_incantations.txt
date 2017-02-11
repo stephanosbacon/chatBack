@@ -17,3 +17,6 @@ docker run -e PROTOCOL=http \
 	   --link some-mongo \
 	   -p 3000:3000 \
 	   localhost:5000/chatback
+
+
+     eval $(minishift docker-env)

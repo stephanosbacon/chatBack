@@ -123,11 +123,13 @@ describe('Test /api/channels', function () {
       .set('Authorization', loginStuff1.token)
       .expect(200)
       .end(function (err, res) {
-        assert.equal(res.body.length, 1, 'check body length');
-        assert.equal(res.body[0]._id, channelId);
-        assert.equal(res.body[0].name, 'A channel');
-        assert.equal(res.body[0].users.length, 2, '2 users');
-        assert.equal(res.body[0].users[0], Users[0]._id);
+        let found = false;
+        res.body.forEach((channel) => {
+          if (channel._id === channelId &&
+            channel.users[0] === Users[0]._id &&
+            channel.users[1] === Users[1]._id) found = true;
+        });
+        assert.equal(found, true);
         done(err);
       });
   });

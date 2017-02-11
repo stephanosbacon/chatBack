@@ -1,0 +1,8 @@
+#! /bin/bash
+
+docker build -t localhost:5000/chatback -f build/Dockerfiles/Dockerfile_server .
+docker push localhost:5000/chatback
+
+
+docker build -t localhost:5000/cb_test -f build/Dockerfiles/Dockerfile_test .
+docker push localhost:5000/cb_test

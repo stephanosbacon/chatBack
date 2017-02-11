@@ -75,7 +75,11 @@ describe('Test Channel Model', function () {
   it('test get all channels', function (done) {
     models.ChannelModel.getAllChannels((status, allChannels) => {
       assert.equal(status.code, 200);
-      assert.equal(allChannels.length, 2);
+      let found = false;
+      allChannels.forEach((channel) => {
+        if (channel._id === secondChannelId) found = true;
+      });
+      assert.equal(found, true);
       done();
     });
   });
