@@ -77,7 +77,7 @@ describe('Test Channel Model', function () {
       assert.equal(status.code, 200);
       let found = false;
       allChannels.forEach((channel) => {
-        if (channel._id === secondChannelId) found = true;
+        if (channel._id.toString() === secondChannelId.toString()) found = true;
       });
       assert.equal(found, true);
       done();

@@ -125,9 +125,9 @@ describe('Test /api/channels', function () {
       .end(function (err, res) {
         let found = false;
         res.body.forEach((channel) => {
-          if (channel._id === channelId &&
-            channel.users[0] === Users[0]._id &&
-            channel.users[1] === Users[1]._id) found = true;
+          if (channel._id.toString() === channelId.toString() &&
+            channel.users[0].toString() === Users[0]._id.toString() &&
+            channel.users[1].toString() === Users[1]._id.toString()) found = true;
         });
         assert.equal(found, true);
         done(err);
