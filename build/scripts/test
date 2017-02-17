@@ -1,11 +1,18 @@
 #! /bin/bash
 
+#export PROTOCOL=http \
+#       JWT_SECRET=somefoo \
+#       MONGO_SERVICE_PORT=30182 \
+#       MONGO_SERVICE_HOST=192.168.99.100 \
+#       PORT=30714 \
+#       SERVICE_HOST=192.168.88.100
+
 export PROTOCOL=http \
        JWT_SECRET=somefoo \
-       MONGO_SERVICE_PORT=30182 \
-       MONGO_SERVICE_HOST=192.168.99.100 \
-       PORT=30714 \
-       SERVICE_HOST=192.168.88.100
+       MONGO_SERVICE_PORT=30864 \
+       MONGO_SERVICE_HOST=192.168.65.2 \
+       PORT=30287 \
+       SERVICE_HOST=192.168.65.2
 
 
 npm test
