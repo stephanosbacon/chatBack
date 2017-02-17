@@ -3,4 +3,4 @@
 eval $(minishift docker-env)
 
 docker build -t chatback -f build/Dockerfiles/Dockerfile_server .
-docker build -t cb_test -f build/Dockerfiles/Dockerfile_test .
+docker build -t cbtest -f build/Dockerfiles/Dockerfile_test .
