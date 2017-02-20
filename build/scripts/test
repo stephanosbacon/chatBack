@@ -18,6 +18,6 @@ export MONGO_SERVICE_PORT=$(minishift service -n chat mongo --url --format {{.Po
 #This will ultimately be a real secret
 export JWT_SECRET=somefoo
 
-echo "service_host " + $SERVICE_HOST + " service_port " + $SERVICE_PORT + " mongo_port " + $MONGO_PORT
+echo "service_host " + $SERVICE_HOST + " service_port " + $SERVICE_PORT + " mongo_port " + $MONGO_SERVICE_PORT
 
 npm test
