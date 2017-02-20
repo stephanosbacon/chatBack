@@ -80,8 +80,12 @@ module.exports.verifyJwtToken = function (token) {
   if (token == null || (typeof token !== 'string')) return null;
 
   let t = token.substring(4);
-  const decoded = jwtToken.verify(t, config.secrets.jwtSecret);
-  return decoded;
+  try {
+    const decoded = jwtToken.verify(t, config.secrets.jwtSecret);
+    return decoded;
+  } catch (err) {
+    return null;
+  }
 };
 
 // Middleware to require login/auth

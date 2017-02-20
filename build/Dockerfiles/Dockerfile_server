@@ -1,9 +1,12 @@
 FROM node:7.5.0
 
+RUN apt-get update && apt-get install -y --no-install-recommends rsync
+
 WORKDIR /usr/src
 
 COPY package.json /usr/src/package.json
 RUN npm install
+RUN npm install -g nodemon
 
 COPY server.js server.js
 COPY auth auth

@@ -4,7 +4,8 @@ let config = include('config/config-dev.js');
 
 const serviceHost = (process.env.SERVICE_HOST || 'localhost');
 
-config.serverUrl = config.protocol + '://' + serviceHost + ':' + config.servicePort;
+config.serverUrl =
+  config.protocol + '://' + serviceHost + ':' + config.servicePort;
 
 config.webSocketUrl =
   config.wsProtocol + '://' + serviceHost + ':' + config.servicePort +
