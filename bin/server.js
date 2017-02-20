@@ -5,7 +5,7 @@ let app = require('./app');
 let http = require(config.protocol);
 
 let options = config.httpOptions;
-let port = config.port;
+let port = config.servicePort;
 
 app.set('port', port);
 

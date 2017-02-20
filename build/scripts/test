@@ -7,12 +7,17 @@
 #       PORT=30714 \
 #       SERVICE_HOST=192.168.88.100
 
-export PROTOCOL=http \
-       JWT_SECRET=somefoo \
-       MONGO_SERVICE_PORT=30864 \
-       MONGO_SERVICE_HOST=192.168.65.2 \
-       PORT=30287 \
-       SERVICE_HOST=192.168.65.2
+export PROTOCOL=http
 
+export SERVICE_HOST=$(minishift ip)
+export SERVICE_PORT=$(minishift service -n chat chatback --url --format {{.Port}})
+
+export MONGO_SERVICE_HOST=$(minishift ip)
+export MONGO_SERVICE_PORT=$(minishift service -n chat mongo --url --format {{.Port}})
+
+#This will ultimately be a real secret
+export JWT_SECRET=somefoo
+
+echo "service_host " + $SERVICE_HOST + " service_port " + $SERVICE_PORT + " mongo_port " + $MONGO_PORT
 
 npm test

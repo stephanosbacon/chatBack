@@ -4,7 +4,7 @@ const fs = require('fs');
 const normalizePort = include('config/normalizePort');
 
 const protocol = process.env.PROTOCOL || 'http';
-const port = normalizePort(process.env.PORT || '3000');
+const servicePort = normalizePort(process.env.SERVICE_PORT || '3000');
 const mongoHost = (process.env.MONGO_SERVICE_HOST || 'localhost');
 const mongoPort = (process.env.MONGO_SERVICE_PORT || '27017');
 const certsPath = (process.env.CERTS_PATH);
@@ -22,7 +22,7 @@ module.exports = {
   'protocol': protocol,
   'wsProtocol': protocol === 'https' ? 'wss' : 'ws',
   'httpOptions': httpOptions,
-  'port': port,
+  'servicePort': servicePort,
   'databaseUrl': databaseUrl,
   'secrets': {
     'jwtSecret': jwtSecret

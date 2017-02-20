@@ -2,12 +2,12 @@
 
 let config = include('config/config-dev.js');
 
-const serverHost = (process.env.SERVER_HOST || 'localhost');
+const serviceHost = (process.env.SERVICE_HOST || 'localhost');
 
-config.serverUrl = config.protocol + '://' + serverHost + ':' + config.port;
+config.serverUrl = config.protocol + '://' + serviceHost + ':' + config.servicePort;
 
 config.webSocketUrl =
-  config.wsProtocol + '://' + serverHost + ':' + config.port +
+  config.wsProtocol + '://' + serviceHost + ':' + config.servicePort +
   '/api/channels?token=';
 
 module.exports = config;
