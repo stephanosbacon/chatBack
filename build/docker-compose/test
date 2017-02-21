@@ -1,0 +1,12 @@
+#! /bin/bash
+
+export PROTOCOL=http
+export SERVICE_HOST=localhost
+export SERVICE_PORT=3000
+
+export MONGO_SERVICE_HOST=localhost
+export MONGO_SERVICE_PORT=27017
+
+# JWT_SECRET also needs to be set
+
+npm test
