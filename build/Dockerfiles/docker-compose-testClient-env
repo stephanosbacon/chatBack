@@ -1,0 +1,11 @@
+
+# Environment variables needed to be set when running with
+# docker-compose.  If you eval $(foo) this file you can then
+# say "npm test" and be happy.
+
+export PROTOCOL=http
+export SERVICE_HOST=localhost
+export SERVICE_PORT=3000
+
+export MONGO_SERVICE_HOST=localhost
+export MONGO_SERVICE_PORT=27017
