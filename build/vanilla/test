@@ -1,0 +1,6 @@
+#! /bin/bash
+
+export DOCKER_SERVICE_HOST=mongo
+
+# set JWT_SECRET
+npm test

@@ -1,7 +1,0 @@
-#! /bin/bash
-
-export PROTOCOL=http \
-       export MONGO_SERVICE_HOST=localhost \
-       JWT_SECRET=somefoo
-
-npm run devstart
