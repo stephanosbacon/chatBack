@@ -1,0 +1,3 @@
+#! /bin/bash
+
+docker-compose -f ./build/Dockerfiles/docker-compose.yml up
