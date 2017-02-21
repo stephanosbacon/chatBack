@@ -1,7 +1,9 @@
 
 # Environment variables needed to be set when running with
 # docker-compose.  If you eval $(foo) this file you can then
-# say "npm test" and be happy.
+# say "export JWT_SECRET=secret && npm test" and be happy.
+# the value of "secret" has to be whatever gets passed to the server
+# container.
 
 export PROTOCOL=http
 export SERVICE_HOST=localhost

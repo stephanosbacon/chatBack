@@ -8,8 +8,11 @@ const servicePort = normalizePort(process.env.SERVICE_PORT || '3000');
 const mongoHost = (process.env.MONGO_SERVICE_HOST || 'localhost');
 const mongoPort = (process.env.MONGO_SERVICE_PORT || '27017');
 const certsPath = (process.env.CERTS_PATH);
-const jwtSecret = (process.env.JWT_SECRET ||
-  'YOU MUST SET THE JWT_SECRET ENVIRONMENT VARIABLE (use secret in openshift)');
+const jwtSecret = process.env.JWT_SECRET;
+
+if (jwtSecret === null) {
+  throw ('YOU MUST SET THE JWT_SECRET ENVIRONMENT VARIABLE (use a secret)');
+}
 
 const databaseUrl = 'mongodb://' + mongoHost + ':' + mongoPort + '/chatter';
 
