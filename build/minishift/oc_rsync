@@ -1,8 +1,10 @@
 #! /bin/bash
-oc rsync ./auth $1:/usr/src
-oc rsync ./bin $1:/usr/src
-oc rsync ./config $1:/usr/src
-oc rsync ./controllers $1:/usr/src
-oc rsync ./models $1:/usr/src
-oc rsync ./routes $1:/usr/src
-oc rsync ./util $1:/usr/src
+
+set -v
+oc rsync -w --no-perms=true ./auth $1:/usr/src&
+oc rsync -w --no-perms=true ./bin $1:/usr/src&
+oc rsync -w --no-perms=true ./config $1:/usr/src&
+oc rsync -w --no-perms=true ./controllers $1:/usr/src&
+oc rsync -w --no-perms=true ./models $1:/usr/src&
+oc rsync -w --no-perms=true ./routes $1:/usr/src&
+oc rsync -w --no-perms=true ./util $1:/usr/src&

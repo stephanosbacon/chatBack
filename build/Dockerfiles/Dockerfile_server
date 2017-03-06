@@ -17,6 +17,7 @@ COPY controllers controllers
 COPY models models
 COPY routes routes
 COPY util util
+RUN chmod 777 *
 
 EXPOSE 3000
 
