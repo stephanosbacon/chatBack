@@ -3,9 +3,12 @@
 let app = require('./app');
 // let debug = require('debug')('chatBack:server');
 let http = require(config.protocol);
+let redis = require('redis');
+let models = include('models/mongoose.js');
 
 let options = config.httpOptions;
 let port = config.servicePort;
+let redisHost = config.redisHost;
 
 app.set('port', port);
 
@@ -62,15 +65,52 @@ wss.on('connection', (ws) => {
 
 app.webSocketServer = wss;
 
+
+let pub = redis.createClient({
+  host: redisHost
+});
+let sub = redis.createClient({
+  host: redisHost
+});
+
+
+sub.on('subscribe', function (channel, count) {
+  console.log('Subscribed to ' + channel +
+    '. Now subscribed to ' + count + ' channel(s).');
+});
+
+
+sub.on('message', function (c, message) {
+  console.log('Message from channel ' + c + ': ' + message);
+
+  let parsedMessage = JSON.parse(message);
+  models.ChannelModel.getSimpleChannel(parsedMessage.channelId,
+    (status, channel) => {
+      if (channel == null) {
+        console.log('Yo, something is broken: ' + message);
+      } else {
+        channel.users.forEach((item) => {
+          if (userSocketMap[item] && userSocketMap[item].sockets != null) {
+            userSocketMap[item].sockets.forEach((item) => {
+              item.send(message);
+            });
+          }
+        });
+      }
+    });
+});
+
+sub.subscribe('messages');
+
+
 wss.broadcast = function (channel, message) {
-  channel.users.forEach((item) => {
-    if (userSocketMap[item] && userSocketMap[item].sockets != null) {
-      userSocketMap[item].sockets.forEach((item) => {
-        item.send(JSON.stringify(message));
-      });
-    }
-  });
+  // Publish it out, so other processes can pick it up.
+  // We are also subscribed so that the sub.on('message'... will)
+  // push it out over websockets known to this processes
+  //
+  pub.publish('messages', JSON.stringify(message));
 };
+
 
 /**
  * Event listener for HTTP server "error" event.

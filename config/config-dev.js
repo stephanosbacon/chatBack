@@ -10,6 +10,8 @@ const mongoPort = (process.env.MONGO_SERVICE_PORT || '27017');
 const certsPath = (process.env.CERTS_PATH);
 const jwtSecret = process.env.JWT_SECRET;
 
+const redisHost = (process.env.REDIS_SERVICE_HOST || 'localhost');
+
 if (jwtSecret === null) {
   throw ('YOU MUST SET THE JWT_SECRET ENVIRONMENT VARIABLE (use a secret)');
 }
@@ -27,6 +29,7 @@ module.exports = {
   'httpOptions': httpOptions,
   'servicePort': servicePort,
   'databaseUrl': databaseUrl,
+  'redisHost': redisHost,
   'secrets': {
     'jwtSecret': jwtSecret
   }

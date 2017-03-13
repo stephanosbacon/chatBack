@@ -4,15 +4,20 @@ services:
     environment:
       - MONGO_SERVICE_HOST=mongo
       - MONGO_SERVICE_PORT=27017
-      - SERVICE_PORT=3000
+      - SERVICE_PORT=2999
       - PROTOCOL=http
       - JWT_SECRET
+      - REDIS_SERVICE_HOST=redis
     build:
       context: ../..
       dockerfile: ./build/Dockerfiles/Dockerfile_server
     ports:
-     - "3000:3000"
+     - "2999:2999"
   mongo:
     image: "mongo"
     ports:
       - "27017:27017"
+  redis:
+    image: "redis"
+    ports:
+      - "6379:6379"

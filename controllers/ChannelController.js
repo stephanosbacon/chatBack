@@ -1,6 +1,6 @@
 'use strict';
 
-var models = include('models/mongoose.js');
+let models = include('models/mongoose.js');
 
 function simplifyChannel(channel) {
   return {

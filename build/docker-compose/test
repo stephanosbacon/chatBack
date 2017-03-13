@@ -2,10 +2,12 @@
 
 export PROTOCOL=http
 export SERVICE_HOST=localhost
-export SERVICE_PORT=3000
+export SERVICE_PORT=2999
 
 export MONGO_SERVICE_HOST=localhost
 export MONGO_SERVICE_PORT=27017
+
+export REDIS_SERVICE_HOST=localhost
 
 # JWT_SECRET also needs to be set
 
