@@ -1,0 +1,32 @@
+#! /bin/bash
+
+# $1 should be a filename containing a secret]
+if [! -e $1 ]; then
+  echo 'Required arg is a filename containing a secret (jwtsecret)'
+  exit 1
+fi
+
+set -v
+
+# oc cluster up --public-hostname 127.0.0.1
+
+oc login -u system:admin
+
+# give the developer user cluster admin privs
+oc adm policy add-cluster-role-to-user cluster-admin developer
+oc login -u developer -p developer
+
+# create the chat project
+oc new-project chat
+oc project chat
+
+
+kompose convert -f ../docker-compose/docker-compose.yml --provider OpenShift
+
+oc create -f chatback-buildconfig.yaml
+oc create -f chatback-deploymentconfig.yaml
+oc create -f chatback-imagestream.yaml
+oc create -f chatback-service.yaml
+oc create -f mongo-deploymentconfig.yaml
+oc create -f mongo-imagestream.yaml
+oc create -f mongo-service.yaml
