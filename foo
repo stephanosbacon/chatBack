@@ -1,7 +1,0 @@
-# $1 should be a filename containing a secret]
-if [ $# -eq 0 ]; then
-  echo 'Required arg is a filename containing a secret (jwtsecret)'
-  exit 1
-fi
-
-echo 'hello'

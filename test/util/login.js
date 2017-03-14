@@ -20,8 +20,9 @@ module.exports = function (email, password, cb) {
     .expect(200)
     .end((err, res) => {
       assert.equal(err, null);
-      assert.equal(verifyJwtToken(res.body.token)
-        ._id, res.body.user._id);
+      let verifyRes = verifyJwtToken(res.body.token);
+      assert.notEqual(verifyRes, null);
+      assert.equal(verifyRes._id, res.body.user._id);
       assert.equal(res.body.token.startsWith('JWT '), true);
       assert.equal(res.body.user.email, email);
       cb(res.body, err);

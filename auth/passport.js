@@ -84,6 +84,7 @@ module.exports.verifyJwtToken = function (token) {
     const decoded = jwtToken.verify(t, config.secrets.jwtSecret);
     return decoded;
   } catch (err) {
+    console.log('jwt token verification failed');
     return null;
   }
 };

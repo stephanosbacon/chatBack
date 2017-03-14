@@ -1,5 +1,11 @@
 #! /bin/bash
 
+$1 should be a filename containing a secret]
+if [ $# -eq 0 ]; then
+  echo 'Required arg is a file containing a secret (jwtsecret)'
+  exit 1
+fi
+
 export PROTOCOL=http
 
 export SERVICE_HOST=$(minishift ip)
@@ -11,4 +17,7 @@ export MONGO_SERVICE_PORT=$(minishift service -n chat mongo --url --format {{.Po
 echo "service_host " $SERVICE_HOST " service_port " $SERVICE_PORT " mongo_port " $MONGO_SERVICE_PORT
 
 # JWT_SECRET needs to be set
+export JWT_SECRET=$(cat $1)
+echo 'JWT_SECRET *'$JWT_SECRET'*'
+
 npm test
