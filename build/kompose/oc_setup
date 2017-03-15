@@ -1,17 +1,15 @@
 #! /bin/bash
 
 # $1 should be a filename containing a secret]
-if [! -e $1 ]; then
+# $1 should be a filename containing a secret]
+if [ $# -eq 0 ]; then
   echo 'Required arg is a filename containing a secret (jwtsecret)'
   exit 1
 fi
 
 set -v
 
-# oc cluster up --public-hostname 127.0.0.1
-
 oc login -u system:admin
-
 # give the developer user cluster admin privs
 oc adm policy add-cluster-role-to-user cluster-admin developer
 oc login -u developer -p developer
@@ -20,10 +18,21 @@ oc login -u developer -p developer
 oc new-project chat
 oc project chat
 
+# create a secret
+oc secret new jwtsecret jwtsecret=$1
 
-kompose convert -f ../docker-compose/docker-compose.yml --provider OpenShift
+# --emptyvols is needed when running in minishift since it doesn't
+# support persistent volumes.  This flags makes kompose not generate
+# persistent volume claim resources
+#
+rm -rf ./converted
+kompose convert -f ../docker-compose/docker-compose.yml \
+                -o ./converted
+                --provider OpenShift \
+                --emptyvols
 
 oc create -f chatback-buildconfig.yaml
+
 oc create -f chatback-deploymentconfig.yaml
 oc create -f chatback-imagestream.yaml
 oc create -f chatback-service.yaml

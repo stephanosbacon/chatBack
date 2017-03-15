@@ -1,8 +1,5 @@
 #! /bin/bash
 
-# oc cluster up --public-hostname 127.0.0.1
-# minishift start
-
 # $1 should be a filename containing a secret]
 if [ $# -eq 0 ]; then
   echo 'Required arg is a filename containing a secret (jwtsecret)'
@@ -11,8 +8,11 @@ fi
 
 set -v
 oc login -u system:admin
+# give the developer user cluster admin privs
 oc adm policy add-cluster-role-to-user cluster-admin developer
 oc login -u developer -p developer
+
+# create the chat project
 oc new-project chat
 oc project chat
 
@@ -21,10 +21,26 @@ oc secret new jwtsecret jwtsecret=$1
 
 oc new-app --docker-image=mongo
 
-# deleting it so we can expose it with type=NodePort
-# Another alternative would be to oc patch the yaml for it
+# oc new-app is nice because it creates a bunch of kubernetes objects
+# but by default it creates a ClusterIP type service, but in order to be
+# able to run tests locally, we need to be able to get at mongo and creating
+# a route into a ClusterIP service won't work because it goes over http
+# so we delete the service and then re-create it at LoadBalancer, which
+# also exposes a NodePort (which is really what we use).
+#
+# This isn't documented very well, unless you know exactly what you're looking
+# for, but here are some pointers:
+# https://github.com/kubernetes/minikube/issues/950
+# https://github.com/kubernetes/minikube/issues/384
+# https://docs.openshift.com/container-platform/3.3/dev_guide/getting_traffic_into_cluster.html#using-the-loadbalancer
+#
 oc delete service mongo
-oc expose dc mongo --type=NodePort
+oc expose dc mondo --type=LoadBalancer --port=27017
+
+# Alternative1:
+#oc create service loadbalancer mongo --tcp=27017:27017
+# Alternative2:
+# oc expose dc mongo --type=NodePort
 
 # now for redis - we don't need to expose anything.
 oc new-app --docker-image=redis
@@ -44,8 +60,16 @@ oc patch dc/chatback -p '{"spec": {"template": {"spec": {"containers": [{"imageP
 # the container will fail to start and good luck finding a long somewhere that tells you why
 oc patch dc/chatback -p '{"spec": {"template": {"spec": {"containers": [{ "name": "chatback", "env": [{	"name": "JWT_SECRET", "valueFrom": { "secretKeyRef": { "name": "jwtsecret", "key": "jwtsecret" }}}]}]}}}}'
 
+# redeploy
 oc rollout latest  dc/chatback
 
+# Now expose the service.  Here, we didn't have to delete it, we could have
+# created a route because it is in fact an http service.  However, we would
+# then have to mess around with hostnames - by default OpenShift generates
+# .xip.io hostnames but they may not be resolvable for one reason or another.
+# So we'd either have to mess with /etc/hosts or run something like dnsmasq
+# At least for local development, running NodePort in this case is probably fine
+#
 oc delete service chatback
 oc expose dc chatback --type=NodePort
 

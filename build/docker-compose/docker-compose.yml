@@ -17,6 +17,11 @@ services:
     image: "mongo"
     ports:
       - "27017:27017"
+    # see https://github.com/kubernetes-incubator/kompose/issues/489#issuecomment-286393089
+    # This isn't necessary for docker-compose, but for kompose
+    volumes:
+      - /data/db
+      - /data/configdb
   redis:
     image: "redis"
     ports:
