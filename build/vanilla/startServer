@@ -3,5 +3,7 @@
 docker run -d --name mongo -p 27017:27017 mongo
 export DOCKER_SERVICE_HOST=mongo
 
+docker run -d --name redis -p 6379:6379 redis
+
 # set JWT_SECRET
 npm run devstart
