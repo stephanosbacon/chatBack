@@ -1,6 +1,7 @@
 #! /bin/bash
 
 export DOCKER_SERVICE_HOST=mongo
+export REDIS_SERVICE_HOST=redis
 
 # set JWT_SECRET
 npm test
