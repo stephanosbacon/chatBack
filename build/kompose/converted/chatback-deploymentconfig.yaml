@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: DeploymentConfig
+metadata:
+  annotations:
+    kompose.service.type: nodeport
+  creationTimestamp: null
+  labels:
+    service: chatback
+  name: chatback
+spec:
+  replicas: 1
+  selector:
+    service: chatback
+  strategy:
+    resources:
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        service: chatback
+    spec:
+      containers:
+        -
+          env:
+            -
+              name: MONGO_SERVICE_HOST
+              value: mongo
+            -
+              name: MONGO_SERVICE_PORT
+              value: '27017'
+            -
+              name: SERVICE_PORT
+              value: '2999'
+            -
+              name: PROTOCOL
+              value: http
+            -
+              name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jwtsecret
+                  key: jwtsecret
+            -
+              name: REDIS_SERVICE_HOST
+              value: redis
+          image: ' '
+          name: chatback
+          ports:
+            -
+              containerPort: 2999
+          resources:
+      restartPolicy: Always
+  test: false
+  triggers:
+    -
+      type: ConfigChange
+    -
+      imageChangeParams:
+        automatic: true
+        containerNames:
+          - chatback
+        from:
+          kind: ImageStreamTag
+          name: 'chatback:latest'
+      type: ImageChange
+status:

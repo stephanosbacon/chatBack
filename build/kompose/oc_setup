@@ -1,5 +1,11 @@
 #! /bin/bash
 
+# assumes that you have kompose (https://github.com/kubernetes-incubator/kompose)
+# you can get it by saying:  go get -u github.com/kubernetes-incubator/kompose
+# assuming that you are set up for go (https://golang.org/doc/install)
+#
+# on OSX you can just "brew install kompose" as well
+
 # $1 should be a filename containing a secret]
 # $1 should be a filename containing a secret]
 if [ $# -eq 0 ]; then
@@ -21,21 +27,29 @@ oc project chat
 # create a secret
 oc secret new jwtsecret jwtsecret=$1
 
+# set pwd to the directory the script is in
+cd "$(dirname "$0")"
+
 # --emptyvols is needed when running in minishift since it doesn't
 # support persistent volumes.  This flags makes kompose not generate
 # persistent volume claim resources
 #
 rm -rf ./converted
+mkdir converted
+
+# note that the docker-compose.yml file has a couple of kompose-specific
+# labels in it that make kompose expose the mongo and chatback
+# in the absence of these labels, one could use the oc cli as is done
+# in ../minishift/oc_setup
+#
 kompose convert -f ../docker-compose/docker-compose.yml \
-                -o ./converted
+                -o ./converted \
                 --provider OpenShift \
                 --emptyvols
 
-oc create -f chatback-buildconfig.yaml
+# This patches the generated yaml to work around bugs and or missing
+# features in kompose.
+#
+node ./patch.js
 
-oc create -f chatback-deploymentconfig.yaml
-oc create -f chatback-imagestream.yaml
-oc create -f chatback-service.yaml
-oc create -f mongo-deploymentconfig.yaml
-oc create -f mongo-imagestream.yaml
-oc create -f mongo-service.yaml
+oc create -f ./converted

@@ -13,10 +13,20 @@ services:
       dockerfile: ./build/Dockerfiles/Dockerfile_server
     ports:
      - "2999:2999"
+    # custom labels for kompose so the service gets exposed
+    # the alternative would be to use the oc cli to do the same
+    # thing after running oc create -f (see ../kompose/oc_setup)
+    labels:
+        kompose.service.type: nodeport
   mongo:
     image: "mongo"
     ports:
       - "27017:27017"
+    # custom labels for kompose so the service gets exposed
+    # the alternative would be to use the oc cli to do the same
+    # thing after running oc create -f (see ../kompose/oc_setup)
+    labels:
+        kompose.service.type: loadbalancer
     # see https://github.com/kubernetes-incubator/kompose/issues/489#issuecomment-286393089
     # This isn't necessary for docker-compose, but for kompose
     volumes:
