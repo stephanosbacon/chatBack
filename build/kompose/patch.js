@@ -17,7 +17,7 @@ function writeObj(obj, file) {
 // Note that a dockerFilePath of the form "./whatever" gets ignored
 let buildConfig = Yaml.load('./converted/chatback-buildconfig.yaml');
 buildConfig.spec.strategy
-  .dockerStrategy.dockerFilePath = 'build/Dockerfiles/Dockerfile_server';
+  .dockerStrategy.dockerfilePath = 'build/Dockerfiles/Dockerfile_server';
 writeObj(buildConfig, './converted/chatback-buildconfig.yaml');
 
 

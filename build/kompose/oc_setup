@@ -50,6 +50,7 @@ kompose convert -f ../docker-compose/docker-compose.yml \
 # This patches the generated yaml to work around bugs and or missing
 # features in kompose.
 #
+npm install
 node ./patch.js
 
 oc create -f ./converted
