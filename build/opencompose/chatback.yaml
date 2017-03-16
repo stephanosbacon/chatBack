@@ -1,0 +1,26 @@
+version: 0.1-dev
+services:
+  - name: chatback
+    containers:
+      - image: chatback
+        env:
+          - MONGO_SERVICE_HOST=mongo
+          - MONGO_SERVICE_PORT=27017
+          - CHATBACK_SERVICE_PORT=2999
+          - PROTOCOL=http
+          - REDIS_SERVICE_HOST=redis
+        ports:
+         - port: 2999:2999
+  - name: mongo
+    containers:
+      - image: mongo
+        ports:
+          - port: 27017:27017
+    volumes:
+      - /data/db
+      - /data/configdb
+  - name: redis
+    containers:
+      - image: redis
+        ports:
+          - port: 6379:6379
