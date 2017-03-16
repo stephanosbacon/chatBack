@@ -12,4 +12,3 @@ correct file to use (there is an open issue to add this feature on kompose).  We
 
 In this case, we use a little javascript program to make these changes rather than oc patch since kompose is generating the yaml for the
 artifacts (think of it as a kompose after burner - which wouldn't be a bad little feature by the way...)
-
