@@ -35,7 +35,7 @@ oc new-app --docker-image=mongo
 # https://docs.openshift.com/container-platform/3.3/dev_guide/getting_traffic_into_cluster.html#using-the-loadbalancer
 #
 oc delete service mongo
-oc expose dc mondo --type=LoadBalancer --port=27017
+oc expose dc mongo --type=LoadBalancer --port=27017
 
 # Alternative1:
 #oc create service loadbalancer mongo --tcp=27017:27017
@@ -75,16 +75,17 @@ oc expose dc chatback --type=NodePort
 # s2i, and the s2i builder that we're using copies _everything_ including the test
 # subdirectory, we don't have two different images.  However for the tester pod, we
 # we want to run npm test not npm start... hmmmm...
+# It looks like there is a way to override the s2i scripts by putting replacements
+# in a .sti/bin directory... parking it for now.
 #
-oc new-app --name=cbtest \
-           --image-stream=chattback \
-           -e PROTOCOL=http \
-           -e MONGO_SERVICE_HOST=mongo \
-           -e MONGO_SERVICE_PORT=27017 \
-           -e CHATBACK_SERVICE_HOST=chatback \
-           -e CHATBACK_SERVICE_PORT=8080
+#oc new-app --name=cbtest \
+#           --image-stream=chattback \
+#           -e PROTOCOL=http \
+#           -e MONGO_SERVICE_HOST=mongo \
+#           -e MONGO_SERVICE_PORT=27017 \
+#           -e CHATBACK_SERVICE_HOST=chatback \
+#           -e CHATBACK_SERVICE_PORT=8080
 
 # now associate the secret with it
-oc patch dc/cbtest -p '{"spec": {"template": {"spec": {"containers": [{ "name": "cbtest", "env": [{	"name": "JWT_SECRET", "valueFrom": { "secretKeyRef": { "name": "jwtsecret", "key": "jwtsecret" }}}]}]}}}}'
-
-oc rollout latest dc/cbtest
+#oc patch dc/cbtest -p '{"spec": {"template": {"spec": {"containers": [{ "name": "cbtest", "env": [{	"name": "JWT_SECRET", "valueFrom": { "secretKeyRef": { "name": "jwtsecret", "key": "jwtsecret" }}}]}]}}}}'
+#oc rollout latest dc/cbtest

@@ -35,7 +35,7 @@ oc new-app --docker-image=mongo
 # https://docs.openshift.com/container-platform/3.3/dev_guide/getting_traffic_into_cluster.html#using-the-loadbalancer
 #
 oc delete service mongo
-oc expose dc mondo --type=LoadBalancer --port=27017
+oc expose dc mongo --type=LoadBalancer --port=27017
 
 # Alternative1:
 #oc create service loadbalancer mongo --tcp=27017:27017

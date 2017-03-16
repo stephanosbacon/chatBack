@@ -1,6 +1,6 @@
 #! /bin/bash
 
-$1 should be a filename containing a secret]
+# $1 should be a filename containing a secret]
 if [ $# -eq 0 ]; then
   echo 'Required arg is a file containing a secret (jwtsecret)'
   exit 1
