@@ -14,7 +14,6 @@ function writeObj(obj, file) {
 
 
 // Workaround for https://github.com/kubernetes-incubator/kompose/issues/486
-// Note that a dockerFilePath of the form "./whatever" gets ignored
 let buildConfig = Yaml.load('./converted/chatback-buildconfig.yaml');
 buildConfig.spec.strategy
   .dockerStrategy.dockerfilePath = 'build/Dockerfiles/Dockerfile_server';
