@@ -4,7 +4,7 @@ const fs = require('fs');
 const normalizePort = include('config/normalizePort');
 
 const protocol = process.env.PROTOCOL || 'http';
-const servicePort = normalizePort(process.env.SERVICE_PORT || '3000');
+const servicePort = normalizePort(process.env.CHATBACK_SERVICE_PORT || '3000');
 const mongoHost = (process.env.MONGO_SERVICE_HOST || 'localhost');
 const mongoPort = (process.env.MONGO_SERVICE_PORT || '27017');
 const certsPath = (process.env.CERTS_PATH);

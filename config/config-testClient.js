@@ -2,7 +2,7 @@
 
 let config = include('config/config-dev.js');
 
-const serviceHost = (process.env.SERVICE_HOST || 'localhost');
+const serviceHost = (process.env.CHATBACK_SERVICE_HOST || 'localhost');
 
 config.serverUrl =
   config.protocol + '://' + serviceHost + ':' + config.servicePort;

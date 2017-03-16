@@ -4,7 +4,7 @@ services:
     environment:
       - MONGO_SERVICE_HOST=mongo
       - MONGO_SERVICE_PORT=27017
-      - SERVICE_PORT=2999
+      - CHATBACK_SERVICE_PORT=2999
       - PROTOCOL=http
       - JWT_SECRET
       - REDIS_SERVICE_HOST=redis
