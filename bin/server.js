@@ -1,14 +1,14 @@
 'use strict';
 
-let app = require('./app');
+const app = require('./app');
 // let debug = require('debug')('chatBack:server');
-let http = require(config.protocol);
-let redis = require('redis');
-let models = include('models/mongoose.js');
+const http = require(config.protocol);
+const redis = require('redis');
+const models = include('models/mongoose.js');
 
-let options = config.httpOptions;
-let port = config.servicePort;
-let redisHost = config.redisHost;
+const options = config.httpOptions;
+const port = config.servicePort;
+const redisHost = config.redisHost;
 
 app.set('port', port);
 
