@@ -1,0 +1,37 @@
+
+#! /bin/bash
+
+# https://docs.openshift.org/latest/install_config/aggregate_logging.html
+
+set -v
+
+oc login -u system:admin
+# give the developer user cluster admin privs
+oc adm policy add-cluster-role-to-user cluster-admin developer
+oc login -u developer -p developer
+
+oc adm new-project logging --node-selector=""
+
+oc apply -n openshift -f \
+    https://raw.githubusercontent.com/openshift/origin-aggregated-logging/master/deployer/deployer.yaml
+
+oc project logging
+
+oc new-app logging-deployer-account-template
+
+oc adm policy add-cluster-role-to-user oauth-editor \
+       system:serviceaccount:logging:logging-deployer
+       
+oc adm policy add-scc-to-user privileged  \
+    system:serviceaccount:logging:aggregated-logging-fluentd
+    
+oc adm policy add-cluster-role-to-user cluster-reader \
+    system:serviceaccount:logging:aggregated-logging-fluentd
+
+oc adm policy add-cluster-role-to-user rolebinding-reader \
+   system:serviceaccount:logging:aggregated-logging-elasticsearch
+
+oc new-app logging-deployer-template
+
+
+
